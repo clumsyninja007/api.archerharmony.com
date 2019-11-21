@@ -34,6 +34,8 @@ namespace api.archerharmony.com
             services.AddSingleton<IBotService, BotService>();
 
             services.Configure<BotConfiguration>(Configuration.GetSection("BotConfiguration"));
+
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

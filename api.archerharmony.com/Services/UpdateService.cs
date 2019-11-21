@@ -18,22 +18,17 @@ namespace api.archerharmony.com.Services
             _logger = logger;
         }
 
-        public async Task EchoAsync(Update update)
+        public async Task EchoAsync(Message message, MessageEntity commandProps)
         {
-            if (update.Type != UpdateType.Message)
-            {
-                return;
-            }
-
-            var message = update.Message;
-
             _logger.LogInformation("Received Message from {0}", message.Chat.Id);
 
             switch (message.Type)
             {
                 case MessageType.Text:
                     // Echo each Message
-                    await _botService.Client.SendTextMessageAsync(message.Chat.Id, message.Text);
+                    await _botService.Client.SendTextMessageAsync(
+                        message.Chat.Id,
+                        message.Text.Substring(commandProps.Offset + commandProps.Length).Trim());
                     break;
                 case MessageType.Photo:
                     {

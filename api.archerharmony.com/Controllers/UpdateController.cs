@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
@@ -18,13 +19,21 @@ namespace api.archerharmony.com.Controllers
         private readonly IUpdateService _updateService;
         private readonly string _token;
         private readonly ILogger<UpdateController> _logger;
+        private readonly IHttpClientFactory _clientFactory;
         private readonly TelegramBotContext _context;
 
-        public UpdateController(IUpdateService updateService, IOptions<BotConfiguration> botConfig, ILogger<UpdateController> logger, TelegramBotContext context)
+        public UpdateController(
+            IUpdateService updateService,
+            IOptions<BotConfiguration> botConfig,
+            ILogger<UpdateController> logger,
+            IHttpClientFactory clientFactory,
+            TelegramBotContext context
+            )
         {
             _updateService = updateService;
             _token = botConfig.Value.BotToken;
             _logger = logger;
+            _clientFactory = clientFactory;
             _context = context;
         }
 
@@ -58,13 +67,13 @@ namespace api.archerharmony.com.Controllers
                     switch (command)
                     {
                         case "/water":
-                        {
-                            var commandText = message.Text.Substring(commandProps.Offset + commandProps.Length).Trim().ToLower();
-                            bool value;
-                            string msgText;
-
-                            switch (commandText)
                             {
+                                var commandText = message.Text.Substring(commandProps.Offset + commandProps.Length).Trim().ToLower();
+                                bool value;
+                                string msgText;
+
+                                switch (commandText)
+                                {
                                     case "on":
                                         value = true;
                                         msgText = "enabled";
@@ -76,33 +85,57 @@ namespace api.archerharmony.com.Controllers
                                     default:
                                         InvalidCommand(chatId);
                                         return Ok();
-                            }
+                                }
 
-                            var chat = await _context.ChatTracker.FindAsync(chatId);
+                                var chat = await _context.ChatTracker.FindAsync(chatId.Identifier);
 
-                            if (chat.WaterReminder != value)
-                            {
-                                chat.WaterReminder = value;
-                                await _context.SaveChangesAsync();
-                                await _updateService.SendMessageAsync(chatId, $"Water notifications {msgText}");
-                            }
-                            else
-                            {
-                                await _updateService.SendMessageAsync(chatId, $"Water notifications already {msgText}");
-                            }
+                                if (chat.WaterReminder != value)
+                                {
+                                    chat.WaterReminder = value;
+                                    await _context.SaveChangesAsync();
+                                    await _updateService.SendMessageAsync(chatId, $"Water notifications {msgText}");
+                                }
+                                else
+                                {
+                                    await _updateService.SendMessageAsync(chatId, $"Water notifications already {msgText}");
+                                }
 
-                            break;
-                        }
+                                break;
+                            }
                         case "/echo":
-                            await _updateService.EchoAsync(update);
+                            await _updateService.EchoAsync(message, commandProps);
                             break;
+                        case "/joke":
+                            {
+                                var request = new HttpRequestMessage(HttpMethod.Get, "https://icanhazdadjoke.com/");
+                                request.Headers.Add("Accept", "text/plain");
+
+                                var client = _clientFactory.CreateClient();
+
+                                var response = await client.SendAsync(request);
+
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    var joke = await response.Content.ReadAsStringAsync();
+
+                                    await _updateService.SendMessageAsync(chatId, joke);
+                                }
+                                else
+                                {
+                                    await _updateService.SendMessageAsync(chatId, "Error getting joke :(");
+                                }
+
+                                client.Dispose();
+
+                                break;
+                            }
                         default:
                             InvalidCommand(chatId);
                             break;
                     }
                 }
             }
-            
+
             return Ok();
         }
 
