@@ -1,17 +1,17 @@
-﻿using api.archerharmony.com.DbContext;
+﻿using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
+using api.archerharmony.com.DbContext;
 using api.archerharmony.com.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace api.archerharmony.com.Controllers
+namespace api.archerharmony.com.Controllers.TelegramBot
 {
     [Route("[controller]")]
     public class UpdateController : ControllerBase

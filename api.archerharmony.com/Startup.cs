@@ -30,6 +30,10 @@ namespace api.archerharmony.com
                 options.UseMySql(Configuration.GetConnectionString("TelegramBot"),
                     mySqlOptions => { mySqlOptions.ServerVersion(new Version(5, 7, 28), ServerType.MySql); }));
 
+            services.AddDbContext<NotkaceContext>(options =>
+                options.UseMySql(Configuration.GetConnectionString("Notkace"),
+                    mySqlOptions => { mySqlOptions.ServerVersion(new Version(5, 7, 28), ServerType.MySql); }));
+
             services.AddScoped<IUpdateService, UpdateService>();
             services.AddSingleton<IBotService, BotService>();
 
