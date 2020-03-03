@@ -25,7 +25,7 @@ namespace api.archerharmony.com.DbContext
         {
             modelBuilder.Entity<Asset>(entity =>
             {
-                entity.ToTable("ASSET", "notkace");
+                entity.ToTable("ASSET");
 
                 entity.HasIndex(e => e.AssetClassId)
                     .HasName("INDEX_CLASS_ID");
@@ -88,7 +88,7 @@ namespace api.archerharmony.com.DbContext
 
                 entity.Property(e => e.Created)
                     .HasColumnName("CREATED")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.LocationId)
                     .HasColumnName("LOCATION_ID")
@@ -118,7 +118,7 @@ namespace api.archerharmony.com.DbContext
 
             modelBuilder.Entity<HdPriority>(entity =>
             {
-                entity.ToTable("HD_PRIORITY", "notkace");
+                entity.ToTable("HD_PRIORITY");
 
                 entity.HasIndex(e => e.HdQueueId)
                     .HasName("HD_QUEUE_IDX");
@@ -181,7 +181,7 @@ namespace api.archerharmony.com.DbContext
 
             modelBuilder.Entity<HdStatus>(entity =>
             {
-                entity.ToTable("HD_STATUS", "notkace");
+                entity.ToTable("HD_STATUS");
 
                 entity.HasIndex(e => e.HdQueueId)
                     .HasName("HD_QUEUE_IDX");
@@ -209,13 +209,13 @@ namespace api.archerharmony.com.DbContext
                 entity.Property(e => e.State)
                     .IsRequired()
                     .HasColumnName("STATE")
-                    .HasColumnType("enum('opened','closed','stalled')")
-                    .HasDefaultValueSql("opened");
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<HdTicket>(entity =>
             {
-                entity.ToTable("HD_TICKET", "notkace");
+                entity.ToTable("HD_TICKET");
 
                 entity.HasIndex(e => e.HdCategoryId)
                     .HasName("HD_CATEGORY_IDX");
@@ -276,7 +276,7 @@ namespace api.archerharmony.com.DbContext
 
                 entity.Property(e => e.Created)
                     .HasColumnName("CREATED")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.CustomFieldValue0)
                     .HasColumnName("CUSTOM_FIELD_VALUE0")
@@ -344,11 +344,11 @@ namespace api.archerharmony.com.DbContext
 
                 entity.Property(e => e.DueDate)
                     .HasColumnName("DUE_DATE")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.Escalated)
                     .HasColumnName("ESCALATED")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.HdCategoryId)
                     .HasColumnName("HD_CATEGORY_ID")
@@ -430,7 +430,7 @@ namespace api.archerharmony.com.DbContext
 
                 entity.Property(e => e.SlaNotified)
                     .HasColumnName("SLA_NOTIFIED")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.SubmitterId)
                     .HasColumnName("SUBMITTER_ID")
@@ -443,15 +443,15 @@ namespace api.archerharmony.com.DbContext
 
                 entity.Property(e => e.TimeClosed)
                     .HasColumnName("TIME_CLOSED")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.TimeOpened)
                     .HasColumnName("TIME_OPENED")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.TimeStalled)
                     .HasColumnName("TIME_STALLED")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.Title)
                     .HasColumnName("TITLE")
@@ -485,7 +485,7 @@ namespace api.archerharmony.com.DbContext
 
             modelBuilder.Entity<HdTicketChange>(entity =>
             {
-                entity.ToTable("HD_TICKET_CHANGE", "notkace");
+                entity.ToTable("HD_TICKET_CHANGE");
 
                 entity.HasIndex(e => e.HdTicketId)
                     .HasName("HD_TICKET_IDX");
@@ -575,7 +575,7 @@ namespace api.archerharmony.com.DbContext
 
                 entity.Property(e => e.Timestamp)
                     .HasColumnName("TIMESTAMP")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.UserId)
                     .HasColumnName("USER_ID")
@@ -601,7 +601,7 @@ namespace api.archerharmony.com.DbContext
             {
                 entity.HasKey(e => e.Id);
 
-                entity.ToTable("USER", "notkace");
+                entity.ToTable("USER");
 
                 entity.HasIndex(e => e.LdapUid)
                     .HasName("IDX_LDAP_UID");
@@ -637,7 +637,7 @@ namespace api.archerharmony.com.DbContext
 
                 entity.Property(e => e.ArchivedDate)
                     .HasColumnName("ARCHIVED_DATE")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.BudgetCode)
                     .HasColumnName("BUDGET_CODE")
@@ -646,7 +646,7 @@ namespace api.archerharmony.com.DbContext
 
                 entity.Property(e => e.Created)
                     .HasColumnName("CREATED")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.DeviceCount)
                     .HasColumnName("DEVICE_COUNT")
@@ -689,7 +689,7 @@ namespace api.archerharmony.com.DbContext
 
                 entity.Property(e => e.LdapImported)
                     .HasColumnName("LDAP_IMPORTED")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e.LdapUid)
                     .HasColumnName("LDAP_UID")
@@ -780,7 +780,7 @@ namespace api.archerharmony.com.DbContext
 
                 entity.Property(e => e._2faCutoffDate)
                     .HasColumnName("2FA_CUTOFF_DATE")
-                    .HasDefaultValueSql("0000-00-00 00:00:00");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(e => e._2faRequired)
                     .HasColumnName("2FA_REQUIRED")
