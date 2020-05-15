@@ -1,13 +1,13 @@
-﻿using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
-using api.archerharmony.com.DbContext;
+﻿using api.archerharmony.com.DbContext;
+using api.archerharmony.com.Models.Telegram;
 using api.archerharmony.com.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -18,29 +18,26 @@ namespace api.archerharmony.com.Controllers.TelegramBot
     {
         private readonly IUpdateService _updateService;
         private readonly string _token;
-        private readonly ILogger<UpdateController> _logger;
         private readonly IHttpClientFactory _clientFactory;
         private readonly TelegramBotContext _context;
 
         public UpdateController(
             IUpdateService updateService,
             IOptions<BotConfiguration> botConfig,
-            ILogger<UpdateController> logger,
             IHttpClientFactory clientFactory,
             TelegramBotContext context
             )
         {
             _updateService = updateService;
             _token = botConfig.Value.BotToken;
-            _logger = logger;
             _clientFactory = clientFactory;
             _context = context;
         }
 
         [HttpGet]
-        public IActionResult Test()
+        public async Task<List<ChatTracker>> GetTrackedChanges()
         {
-            return Ok("Test");
+            return await _context.ChatTracker.ToListAsync();
         }
 
         [HttpPost("{token}")]
@@ -50,8 +47,6 @@ namespace api.archerharmony.com.Controllers.TelegramBot
             {
                 return Unauthorized("Invalid bot token");
             }
-
-            _logger.LogInformation(JsonSerializer.Serialize(update));
 
             if (update.Type == UpdateType.Message)
             {
@@ -87,7 +82,12 @@ namespace api.archerharmony.com.Controllers.TelegramBot
                                         return Ok();
                                 }
 
-                                var chat = await _context.ChatTracker.FindAsync(chatId.Identifier);
+                                var chat = await _context.ChatTracker.Where(c => c.ChatId == chatId.Identifier).FirstOrDefaultAsync();
+
+                                if (chat == null)
+                                {
+                                    return BadRequest("Chat not found");
+                                }
 
                                 if (chat.WaterReminder != value)
                                 {

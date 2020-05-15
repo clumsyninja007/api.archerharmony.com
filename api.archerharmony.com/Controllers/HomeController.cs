@@ -2,7 +2,7 @@
 
 namespace api.archerharmony.com.Controllers
 {
-    [Route("[controller]")]
+    [Route("")]
     public class HomeController : ControllerBase
     {
         // GET: /<controller>/

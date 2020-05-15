@@ -46,11 +46,13 @@ namespace api.archerharmony.com.Controllers.Notkace
         [HttpGet("owners")]
         public async Task<ActionResult<List<User>>> GetOwners()
         {
-            return await _context.User
+            var foo = await _context.User
                 .Where(u => u.RoleId == 5)
                 .OrderBy(u => u.FullName)
                 .AsNoTracking()
                 .ToListAsync();
+
+            return foo;
         }
     }
 }
