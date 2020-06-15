@@ -46,11 +46,11 @@ namespace api.archerharmony.com
                 .AddNewtonsoftJson();
 
             services.AddDbContext<TelegramBotContext>(options =>
-                options.UseMySql(GetSecretOrEnvVar("ConnectionStrings:TelegramBot"),
+                options.UseMySql(GetSecretOrEnvVar("ConnectionStrings__TelegramBot"),
                     mySqlOptions => { mySqlOptions.ServerVersion(new Version(10, 4, 12), ServerType.MariaDb); }));
 
             services.AddDbContext<NotkaceContext>(options =>
-                options.UseMySql(GetSecretOrEnvVar("ConnectionStrings:Notkace"),
+                options.UseMySql(GetSecretOrEnvVar("ConnectionStrings__Notkace"),
                     mySqlOptions => { mySqlOptions.ServerVersion(new Version(10, 4, 12), ServerType.MariaDb); }));
 
             services.AddScoped<IUpdateService, UpdateService>();
@@ -59,7 +59,7 @@ namespace api.archerharmony.com
             //services.Configure<BotConfiguration>(Configuration.GetSection("TelegramBot:BotConfiguration"));
             var botConfig = new BotConfiguration
             {
-                BotToken = GetSecretOrEnvVar("TelegramBot:BotConfiguration:BotToken")
+                BotToken = GetSecretOrEnvVar("TelegramBot__BotConfiguration__BotToken")
             };
             services.AddSingleton(botConfig);
 
