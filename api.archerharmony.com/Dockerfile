@@ -4,9 +4,9 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
 WORKDIR /app
 EXPOSE 80
 
-ENV ConnectionStrings__TelegramBot
-ENV ConnectionStrings__Notkace
-ENV TelegramBot__BotConfiguration__BotToken
+ENV ConnectionStrings__TelegramBot=
+ENV ConnectionStrings__Notkace=
+ENV TelegramBot__BotConfiguration__BotToken=
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
