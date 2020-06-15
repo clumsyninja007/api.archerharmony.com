@@ -44,17 +44,17 @@ namespace api.archerharmony.com
                 .AddNewtonsoftJson();
 
             services.AddDbContext<TelegramBotContext>(options =>
-                options.UseMySql(Configuration.GetConnectionString("TelegramBot"),
+                options.UseMySql(Configuration["ConnectionStrings:TelegramBot"],
                     mySqlOptions => { mySqlOptions.ServerVersion(new Version(10, 4, 12), ServerType.MariaDb); }));
 
             services.AddDbContext<NotkaceContext>(options =>
-                options.UseMySql(Configuration.GetConnectionString("Notkace"),
+                options.UseMySql(Configuration["ConnectionStrings:Notkace"],
                     mySqlOptions => { mySqlOptions.ServerVersion(new Version(10, 4, 12), ServerType.MariaDb); }));
 
             services.AddScoped<IUpdateService, UpdateService>();
             services.AddSingleton<IBotService, BotService>();
 
-            services.Configure<BotConfiguration>(Configuration.GetSection("BotConfiguration"));
+            services.Configure<BotConfiguration>(Configuration.GetSection("TelegramBot:BotConfiguration"));
 
             services.AddHttpClient();
 
