@@ -130,7 +130,7 @@ namespace api.archerharmony.com
                 }
             }
 
-            return Configuration.GetValue<string>(key);
+            return Configuration.GetValue<string>(key.Replace("__", ":"));
         }
 
     }
