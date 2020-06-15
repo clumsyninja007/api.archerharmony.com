@@ -6,9 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -44,17 +46,22 @@ namespace api.archerharmony.com
                 .AddNewtonsoftJson();
 
             services.AddDbContext<TelegramBotContext>(options =>
-                options.UseMySql(Configuration["ConnectionStrings:TelegramBot"],
+                options.UseMySql(GetSecretOrEnvVar("ConnectionStrings:TelegramBot"),
                     mySqlOptions => { mySqlOptions.ServerVersion(new Version(10, 4, 12), ServerType.MariaDb); }));
 
             services.AddDbContext<NotkaceContext>(options =>
-                options.UseMySql(Configuration["ConnectionStrings:Notkace"],
+                options.UseMySql(GetSecretOrEnvVar("ConnectionStrings:Notkace"),
                     mySqlOptions => { mySqlOptions.ServerVersion(new Version(10, 4, 12), ServerType.MariaDb); }));
 
             services.AddScoped<IUpdateService, UpdateService>();
             services.AddSingleton<IBotService, BotService>();
 
-            services.Configure<BotConfiguration>(Configuration.GetSection("TelegramBot:BotConfiguration"));
+            //services.Configure<BotConfiguration>(Configuration.GetSection("TelegramBot:BotConfiguration"));
+            var botConfig = new BotConfiguration
+            {
+                BotToken = GetSecretOrEnvVar("TelegramBot:BotConfiguration:BotToken")
+            };
+            services.AddSingleton(botConfig);
 
             services.AddHttpClient();
 
@@ -105,5 +112,26 @@ namespace api.archerharmony.com
 
             app.UseHealthChecks("/health");
         }
+
+        public string GetSecretOrEnvVar(string key)
+        {
+            const string DOCKER_SECRET_PATH = "/run/secrets/";
+            if (Directory.Exists(DOCKER_SECRET_PATH))
+            {
+                IFileProvider provider = new PhysicalFileProvider(DOCKER_SECRET_PATH);
+                IFileInfo fileInfo = provider.GetFileInfo(key);
+                if (fileInfo.Exists)
+                {
+                    using (var stream = fileInfo.CreateReadStream())
+                    using (var streamReader = new StreamReader(stream))
+                    {
+                        return streamReader.ReadToEnd();
+                    }
+                }
+            }
+
+            return Configuration.GetValue<string>(key);
+        }
+
     }
 }
