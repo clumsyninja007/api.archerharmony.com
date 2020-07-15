@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System;
@@ -56,7 +55,6 @@ namespace api.archerharmony.com
             services.AddScoped<IUpdateService, UpdateService>();
             services.AddSingleton<IBotService, BotService>();
 
-            //services.Configure<BotConfiguration>(Configuration.GetSection("TelegramBot:BotConfiguration"));
             var botConfig = new BotConfiguration
             {
                 BotToken = GetSecretOrEnvVar("TelegramBot__BotConfiguration__BotToken")
@@ -67,7 +65,7 @@ namespace api.archerharmony.com
 
             services.AddHealthChecks()
                 .AddAsyncCheck("Http", async () =>
-                { 
+                {
                     using (HttpClient client = new HttpClient())
                     {
                         try
@@ -118,19 +116,10 @@ namespace api.archerharmony.com
             const string DOCKER_SECRET_PATH = "/run/secrets/";
             if (Directory.Exists(DOCKER_SECRET_PATH))
             {
-                IFileProvider provider = new PhysicalFileProvider(DOCKER_SECRET_PATH);
-                IFileInfo fileInfo = provider.GetFileInfo(key);
-                if (fileInfo.Exists)
-                {
-                    using (var stream = fileInfo.CreateReadStream())
-                    using (var streamReader = new StreamReader(stream))
-                    {
-                        return streamReader.ReadToEnd();
-                    }
-                }
+                return File.ReadAllText(Environment.GetEnvironmentVariable(key));
             }
 
-            return Configuration.GetValue<string>(key.Replace("__",":"));
+            return Configuration.GetValue<string>(key.Replace("__", ":"));
         }
     }
 }
