@@ -1,27 +1,27 @@
 using api.archerharmony.com.Models.Notkace;
 
-namespace api.archerharmony.com.Features.Notkace.Assets.GetAsset;
+namespace api.archerharmony.com.Features.Notkace.Users.GetUser;
 
-public class Endpoint(NotkaceContext context) : Endpoint<Request, Asset>
+public class Endpoint(NotkaceContext context) : Endpoint<Request, User>
 {
     public override void Configure()
     {
         Get("{id}");
-        Group<AssetsGroup>();
+        Group<UsersGroup>();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var asset = await context.Asset
+        var user = await context.User
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == req.Id, ct);
 
-        if (asset == null)
+        if (user == null)
         {
-            await SendNotFoundAsync(ct);
+            await SendNoContentAsync(ct);
             return;
         }
 
-        Response = asset;
+        Response = user;
     }
 }

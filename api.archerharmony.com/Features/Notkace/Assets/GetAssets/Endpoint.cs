@@ -12,7 +12,7 @@ public class Endpoint(NotkaceContext context) : Endpoint<Request, List<Asset>>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var query = context.Asset.AsQueryable();
+        var query = context.Asset.AsNoTracking();
 
         if (req.Id is not null)
         {

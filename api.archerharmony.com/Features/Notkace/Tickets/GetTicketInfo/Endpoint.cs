@@ -26,7 +26,6 @@ public partial class Endpoint(NotkaceContext context) : Endpoint<Request, Respon
                 OwnersOnly = c.OwnersOnly
             })
             .OrderByDescending(c => c.Timestamp)
-            .AsNoTracking()
             .FirstOrDefaultAsync(ct);
 
         if (info is null)
