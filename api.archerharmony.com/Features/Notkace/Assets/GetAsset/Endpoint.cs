@@ -12,7 +12,7 @@ public class Endpoint(NotkaceContext context) : Endpoint<Request, Asset>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var asset = await context.Asset
+        var asset = await context.Assets
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == req.Id, ct);
 

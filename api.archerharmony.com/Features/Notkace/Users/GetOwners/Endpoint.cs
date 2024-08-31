@@ -12,7 +12,7 @@ public class Endpoint(NotkaceContext context) : EndpointWithoutRequest<List<User
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var users = await context.User
+        var users = await context.Users
             .AsNoTracking()
             .Where(u => u.RoleId == 5)
             .OrderBy(u => u.FullName)

@@ -13,12 +13,12 @@ public class NotkaceContext : Microsoft.EntityFrameworkCore.DbContext
     {
     }
 
-    public virtual DbSet<Asset> Asset { get; set; }
-    public virtual DbSet<HdPriority> HdPriority { get; set; }
-    public virtual DbSet<HdStatus> HdStatus { get; set; }
-    public virtual DbSet<HdTicket> HdTicket { get; set; }
-    public virtual DbSet<HdTicketChange> HdTicketChange { get; set; }
-    public virtual DbSet<User> User { get; set; }
+    public virtual DbSet<Asset> Assets { get; set; }
+    public virtual DbSet<HdPriority> HdPriorities { get; set; }
+    public virtual DbSet<HdStatus> HdStatuses { get; set; }
+    public virtual DbSet<HdTicket> HdTickets { get; set; }
+    public virtual DbSet<HdTicketChange> HdTicketChanges { get; set; }
+    public virtual DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

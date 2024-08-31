@@ -10,7 +10,7 @@ public class Endpoint(NotkaceContext context) : Endpoint<Request, Response>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var hdTicket = await context.HdTicket
+        var hdTicket = await context.HdTickets
             .Where(t => t.Id == req.Id)
             .Select(t => new Response
             {
