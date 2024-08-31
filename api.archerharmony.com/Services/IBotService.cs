@@ -1,9 +1,8 @@
 ﻿using Telegram.Bot;
 
-namespace api.archerharmony.com.Services
+namespace api.archerharmony.com.Services;
+
+public interface IBotService
 {
-    public interface IBotService
-    {
-        TelegramBotClient Client { get; }
-    }
+    TelegramBotClient Client { get; }
 }
