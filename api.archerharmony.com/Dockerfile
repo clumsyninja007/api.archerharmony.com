@@ -4,13 +4,13 @@ WORKDIR /app
 EXPOSE 80
 
 ARG ConnectionStrings__TelegramBot
-ENV ConnectionStrings__TelegramBot $ConnectionStrings__TelegramBot
+ENV ConnectionStrings__TelegramBot=$ConnectionStrings__TelegramBot
 
 ARG ConnectionStrings__Notkace
-ENV ConnectionStrings__Notkace $ConnectionStrings__Notkace
+ENV ConnectionStrings__Notkace=$ConnectionStrings__Notkace
 
 ARG TelegramBot__BotConfiguration__BotToken
-ENV TelegramBot__BotConfiguration__BotToken $TelegramBot__BotConfiguration__BotToken
+ENV TelegramBot__BotConfiguration__BotToken=$TelegramBot__BotConfiguration__BotToken
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
