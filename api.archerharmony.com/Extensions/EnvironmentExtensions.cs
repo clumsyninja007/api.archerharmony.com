@@ -9,13 +9,17 @@ public static class EnvironmentExtensions
 {
     private const string DockerSecretPath = "/run/secrets/";
     
-    public static string GetSecretOrEnvVar(this WebApplicationBuilder builder, string key)
+    public static string? GetSecretOrEnvVar(this WebApplicationBuilder builder, string key)
     {
-        if (Directory.Exists(DockerSecretPath))
+        if (!Directory.Exists(DockerSecretPath))
         {
-            return File.ReadAllText(Environment.GetEnvironmentVariable(key));
+            return builder.Configuration.GetValue<string>(key.Replace("__", ":"));
         }
+        
+        var envVariable = Environment.GetEnvironmentVariable(key);
 
-        return builder.Configuration.GetValue<string>(key.Replace("__", ":"));
+        return string.IsNullOrEmpty(envVariable) 
+            ? null 
+            : File.ReadAllText(envVariable);
     }
 }

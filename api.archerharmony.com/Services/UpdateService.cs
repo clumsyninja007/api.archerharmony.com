@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.IO;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -18,22 +19,41 @@ public class UpdateService : IUpdateService
 
     public async Task EchoAsync(Message message, MessageEntity commandProps)
     {
-        _logger.LogInformation("Received Message from {0}", message.Chat.Id);
+        _logger.LogInformation("Received Message from {ChatId}", message.Chat.Id);
 
         switch (message.Type)
         {
             case MessageType.Text:
+                if (string.IsNullOrWhiteSpace(message.Text))
+                {
+                    await _botService.Client.SendTextMessageAsync(message.Chat.Id, "Message type not supported");
+                    break;
+                }
+                
                 // Echo each Message
                 await _botService.Client.SendTextMessageAsync(
                     message.Chat.Id,
-                    message.Text.Substring(commandProps.Offset + commandProps.Length).Trim());
+                    message.Text[(commandProps.Offset + commandProps.Length)..].Trim());
                 break;
             case MessageType.Photo:
             {
                 // Download Photo
-                var fileId = message.Photo.LastOrDefault()?.FileId;
+                var fileId = message.Photo?.LastOrDefault()?.FileId;
+
+                if (string.IsNullOrEmpty(fileId))
+                {
+                    await _botService.Client.SendTextMessageAsync(message.Chat.Id, "File not found");
+                    break;
+                }
+                
                 var file = await _botService.Client.GetFileAsync(fileId);
 
+                if (string.IsNullOrEmpty(file.FilePath))
+                {
+                    await _botService.Client.SendTextMessageAsync(message.Chat.Id, "File not found");
+                    break;
+                }
+                
                 var filename = file.FileId + "." + file.FilePath.Split('.').Last();
 
                 await using (var saveImageStream = System.IO.File.Open(filename, FileMode.Create))

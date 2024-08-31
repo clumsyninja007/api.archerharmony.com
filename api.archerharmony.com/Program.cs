@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,20 +23,41 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 
+var telegramBotConnString = builder.GetSecretOrEnvVar("ConnectionStrings__TelegramBot");
+if (string.IsNullOrEmpty(telegramBotConnString))
+{
+    throw new Exception("ConnectionStrings__TelegramBot is required");
+}
+
 builder.Services.AddDbContext<TelegramBotContext>(options =>
-    options.UseMySql(builder.GetSecretOrEnvVar("ConnectionStrings__TelegramBot"),
-        mySqlOptions => { mySqlOptions.ServerVersion(new Version(10, 4, 12), ServerType.MariaDb); }));
+    options.UseMySql(
+        telegramBotConnString,
+        new MariaDbServerVersion(new Version(10, 4, 12)))
+    );
+
+var notkaceConnString = builder.GetSecretOrEnvVar("ConnectionStrings__Notkace");
+if (string.IsNullOrEmpty(notkaceConnString))
+{
+    throw new Exception("ConnectionStrings__Notkace is required");
+}
 
 builder.Services.AddDbContext<NotkaceContext>(options =>
-    options.UseMySql(builder.GetSecretOrEnvVar("ConnectionStrings__Notkace"),
-        mySqlOptions => { mySqlOptions.ServerVersion(new Version(10, 4, 12), ServerType.MariaDb); }));
+    options.UseMySql(notkaceConnString,
+        new MariaDbServerVersion(new Version(10, 4, 12)))
+    );
 
 builder.Services.AddScoped<IUpdateService, UpdateService>();
 builder.Services.AddSingleton<IBotService, BotService>();
 
+var botToken = builder.GetSecretOrEnvVar("TelegramBot__BotConfiguration__BotToken");
+if (string.IsNullOrEmpty(botToken))
+{
+    throw new Exception("TelegramBot__BotConfiguration__BotToken is required");
+}
+
 var botConfig = new BotConfiguration
 {
-    BotToken = builder.GetSecretOrEnvVar("TelegramBot__BotConfiguration__BotToken")
+    BotToken = botToken
 };
 builder.Services.AddSingleton(botConfig);
 
