@@ -1,23 +1,29 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER $APP_UID
 WORKDIR /app
 EXPOSE 80
 
-ENV ConnectionStrings__TelegramBot=
-ENV ConnectionStrings__Notkace=
-ENV TelegramBot__BotConfiguration__BotToken=
+ARG ConnectionStrings__TelegramBot
+ENV ConnectionStrings__TelegramBot $ConnectionStrings__TelegramBot
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+ARG ConnectionStrings__Notkace
+ENV ConnectionStrings__Notkace $ConnectionStrings__Notkace
+
+ARG TelegramBot__BotConfiguration__BotToken
+ENV TelegramBot__BotConfiguration__BotToken $TelegramBot__BotConfiguration__BotToken
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["api.archerharmony.com/api.archerharmony.com.csproj", "api.archerharmony.com/"]
 RUN dotnet restore "api.archerharmony.com/api.archerharmony.com.csproj"
 COPY . .
 WORKDIR "/src/api.archerharmony.com"
-RUN dotnet build "api.archerharmony.com.csproj" -c Release -o /app/build
+RUN dotnet build "api.archerharmony.com.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "api.archerharmony.com.csproj" -c Release -o /app/publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "api.archerharmony.com.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

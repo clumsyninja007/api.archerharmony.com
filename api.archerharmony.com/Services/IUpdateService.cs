@@ -1,12 +1,10 @@
-﻿using System.Threading.Tasks;
-using Telegram.Bot.Types;
+﻿using Telegram.Bot.Types;
 
-namespace api.archerharmony.com.Services
+namespace api.archerharmony.com.Services;
+
+public interface IUpdateService
 {
-    public interface IUpdateService
-    {
-        Task EchoAsync(Message message, MessageEntity commandProps);
-        Task WaterReminderAsync(ChatId chatId);
-        Task SendMessageAsync(ChatId chatId, string message);
-    }
+    Task EchoAsync(Message message, MessageEntity commandProps);
+    Task WaterReminderAsync(ChatId chatId);
+    Task SendMessageAsync(ChatId chatId, string message);
 }
