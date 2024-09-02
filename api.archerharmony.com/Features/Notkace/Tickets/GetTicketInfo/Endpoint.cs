@@ -14,9 +14,8 @@ public partial class Endpoint(NotkaceContext context) : Endpoint<Request, Respon
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
         var info = await context.HdTicketChanges
-            .Where(c => c.Id == req.Id)
+            .Where(c => c.HdTicketId == req.Id)
             .Where(c => !string.IsNullOrEmpty(c.Comment))
-            .Where(c => c.Comment != "")
             .Select(c => new Response
             {
                 Ticket = c.HdTicket.Id,

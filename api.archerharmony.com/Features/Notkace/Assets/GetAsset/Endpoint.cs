@@ -1,4 +1,4 @@
-using api.archerharmony.com.Models.Notkace;
+using api.archerharmony.com.Entities.Notkace;
 
 namespace api.archerharmony.com.Features.Notkace.Assets.GetAsset;
 

@@ -61,7 +61,7 @@ public class Endpoint(
                                 return;
                         }
 
-                        var chat = await context.ChatTracker
+                        var chat = await context.ChatTrackers
                             .Where(c => c.ChatId == chatId.Identifier)
                             .FirstOrDefaultAsync(ct);
 

@@ -21,7 +21,7 @@ public class Endpoint(
             await SendUnauthorizedAsync(ct);
         }
 
-        var reminderList = await context.ChatTracker
+        var reminderList = await context.ChatTrackers
             .Where(c => c.Active)
             .Where(c => c.WaterReminder)
             .ToListAsync(ct);

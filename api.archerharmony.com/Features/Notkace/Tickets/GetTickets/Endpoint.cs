@@ -19,17 +19,17 @@ public class Endpoint(NotkaceContext context) : Endpoint<Request, Response>
             {
                 Ticket = t.Id,
                 Title = t.Title,
-                Priority = t.Priority.Name,
+                Priority = t.HdPriority.Name,
                 Owner = t.Owner.FullName,
                 Submitter = t.Submitter.FullName,
                 Asset = t.Asset.Name,
-                Status = t.Status.Name,
+                Status = t.HdStatus.Name,
                 ReferredTo = t.CustomFieldValue5,
                 UserName = t.Owner.UserName,
                 Dept = t.CustomFieldValue1,
                 Location = t.CustomFieldValue2,
-                PriOrd = t.Priority.Ordinal,
-                StatOrd = t.Status.Ordinal,
+                PriOrd = t.HdPriority.Ordinal,
+                StatOrd = t.HdStatus.Ordinal,
                 Created = t.Created
             });
 

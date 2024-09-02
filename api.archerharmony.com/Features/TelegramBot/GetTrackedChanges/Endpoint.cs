@@ -1,4 +1,4 @@
-using api.archerharmony.com.Models.Telegram;
+using api.archerharmony.com.Entities.Telegram;
 
 namespace api.archerharmony.com.Features.TelegramBot.GetTrackedChanges;
 
@@ -11,6 +11,6 @@ public class Endpoint(TelegramBotContext context) : EndpointWithoutRequest<List<
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        Response = await context.ChatTracker.ToListAsync(ct);
+        Response = await context.ChatTrackers.ToListAsync(ct);
     }
 }

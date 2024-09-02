@@ -1,4 +1,4 @@
-using api.archerharmony.com.Models.Notkace;
+using api.archerharmony.com.Entities.Notkace;
 
 namespace api.archerharmony.com.Features.Notkace.Assets.GetAssets;
 
@@ -8,6 +8,7 @@ public class Endpoint(NotkaceContext context) : Endpoint<Request, List<Asset>>
     {
         Verbs(Http.GET);
         Routes("", "type/{id}");
+        Group<AssetsGroup>();
         AllowAnonymous();
     }
 
