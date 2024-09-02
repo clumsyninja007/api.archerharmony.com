@@ -3,6 +3,7 @@ using System.Net.Http;
 using api.archerharmony.com;
 using api.archerharmony.com.Extensions;
 using api.archerharmony.com.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -46,9 +47,6 @@ builder.Services.AddDbContext<NotkaceContext>(options =>
         new MariaDbServerVersion(new Version(10, 4, 12)))
     );
 
-builder.Services.AddScoped<IUpdateService, UpdateService>();
-builder.Services.AddSingleton<IBotService, BotService>();
-
 var botToken = builder.GetSecretOrEnvVar("TelegramBot__BotConfiguration__BotToken");
 if (string.IsNullOrEmpty(botToken))
 {
@@ -61,34 +59,37 @@ var botConfig = new BotConfiguration
 };
 builder.Services.AddSingleton(botConfig);
 
+builder.Services.AddScoped<IUpdateService, UpdateService>();
+builder.Services.AddSingleton<IBotService, BotService>();
+
 builder.Services.AddHttpClient();
 
-builder.Services.AddHealthChecks()
-    .AddAsyncCheck("Http", async () =>
-    {
-        using (var client = new HttpClient())
-        {
-            try
-            {
-                var response = await client.GetAsync("http://localhost/Users/owners");
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception("Notkace not responding with 200 OK");
-                }
-
-                response = await client.GetAsync("http://localhost/update");
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception("Telegram Bot not responding with 200 OK");
-                }
-            }
-            catch (Exception)
-            {
-                return await Task.FromResult(HealthCheckResult.Unhealthy());
-            }
-        }
-        return await Task.FromResult(HealthCheckResult.Healthy());
-    });
+// builder.Services.AddHealthChecks()
+    // .AddAsyncCheck("Http", async () =>
+    // {
+    //     using (var client = new HttpClient())
+    //     {
+    //         try
+    //         {
+    //             var response = await client.GetAsync("http://localhost/Users/owners");
+    //             if (!response.IsSuccessStatusCode)
+    //             {
+    //                 throw new Exception("Notkace not responding with 200 OK");
+    //             }
+    //
+    //             response = await client.GetAsync("http://localhost/update");
+    //             if (!response.IsSuccessStatusCode)
+    //             {
+    //                 throw new Exception("Telegram Bot not responding with 200 OK");
+    //             }
+    //         }
+    //         catch (Exception)
+    //         {
+    //             return await Task.FromResult(HealthCheckResult.Unhealthy());
+    //         }
+    //     }
+    //     return await Task.FromResult(HealthCheckResult.Healthy());
+    // });
 
 builder.Services.AddFastEndpoints();
 
@@ -107,6 +108,6 @@ else
 
 app.UseFastEndpoints();
 
-app.UseHealthChecks("/health");
+// app.UseHealthChecks("/health");
 
 app.Run();

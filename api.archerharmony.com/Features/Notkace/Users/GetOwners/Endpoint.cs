@@ -8,6 +8,7 @@ public class Endpoint(NotkaceContext context) : EndpointWithoutRequest<List<User
     {
         Get("owners");
         Group<UsersGroup>();
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)

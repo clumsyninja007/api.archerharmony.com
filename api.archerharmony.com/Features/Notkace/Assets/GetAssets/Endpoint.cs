@@ -8,6 +8,7 @@ public class Endpoint(NotkaceContext context) : Endpoint<Request, List<Asset>>
     {
         Verbs(Http.GET);
         Routes("", "type/{id}");
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)

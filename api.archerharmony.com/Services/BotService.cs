@@ -7,19 +7,17 @@ namespace api.archerharmony.com.Services;
 
 public class BotService : IBotService
 {
-    public BotService(IOptions<BotConfiguration> botConfig)
+    public BotService(BotConfiguration botConfig)
     {
-        var config = botConfig.Value;
-
-        if (string.IsNullOrEmpty(config.Socks5Host))
+        if (string.IsNullOrEmpty(botConfig.Socks5Host))
         {
-            Client = new TelegramBotClient(config.BotToken);
+            Client = new TelegramBotClient(botConfig.BotToken);
         }
         else
         {
             var proxy = new HttpToSocks5Proxy(
-                config.Socks5Host, 
-                config.Socks5Port
+                botConfig.Socks5Host, 
+                botConfig.Socks5Port
             );
 
             var httpClientHandler = new HttpClientHandler
@@ -29,7 +27,7 @@ public class BotService : IBotService
             };
             var httpClient = new HttpClient(httpClientHandler);
             
-            Client = new TelegramBotClient(new TelegramBotClientOptions(config.BotToken), httpClient);
+            Client = new TelegramBotClient(new TelegramBotClientOptions(botConfig.BotToken), httpClient);
         }
     }
 

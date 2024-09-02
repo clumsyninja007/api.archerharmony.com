@@ -8,6 +8,7 @@ public class Endpoint(NotkaceContext context) : Endpoint<Request, Response>
     {
         Get("");
         Group<TicketsGroup>();
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)

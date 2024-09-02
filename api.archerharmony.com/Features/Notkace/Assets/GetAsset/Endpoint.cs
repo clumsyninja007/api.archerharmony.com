@@ -8,6 +8,7 @@ public class Endpoint(NotkaceContext context) : Endpoint<Request, Asset>
     {
         Get("{id}");
         Group<AssetsGroup>();
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
