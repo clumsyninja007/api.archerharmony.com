@@ -7,8 +7,6 @@ namespace api.archerharmony.com.Extensions;
 
 public static class EnvironmentExtensions
 {
-    private const string DockerSecretPath = "/run/secrets/";
-    
     public static string? GetSecretOrEnvVar(this WebApplicationBuilder builder, string key)
     {
         var envVariable = Environment.GetEnvironmentVariable(key);

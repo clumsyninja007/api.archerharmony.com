@@ -1,7 +1,7 @@
 using System;
 using api.archerharmony.com;
-using api.archerharmony.com.Context;
 using api.archerharmony.com.Extensions;
+using api.archerharmony.com.Features.Health;
 using api.archerharmony.com.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +21,9 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("https://notkace.archerharmony.com")
             .AllowAnyMethod());
 });
+
+builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>("database_health_check");
 
 var telegramBotConnString = builder.GetSecretOrEnvVar("ConnectionStrings__TelegramBot");
 if (string.IsNullOrEmpty(telegramBotConnString))
@@ -78,5 +81,7 @@ else
 }
 
 app.UseFastEndpoints();
+
+app.MapHealthChecks("/health");
 
 app.Run();
