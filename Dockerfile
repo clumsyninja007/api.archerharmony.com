@@ -1,7 +1,7 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
 WORKDIR /app
-EXPOSE 80
+RUN apt-get update && apt-get install -y curl
+USER $APP_UID
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -20,4 +20,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "api.archerharmony.com.dll"]
-HEALTHCHECK CMD curl --fail http://localhost/health || exit
+HEALTHCHECK CMD curl --fail http://localhost:8080/healthz || exit

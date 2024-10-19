@@ -82,6 +82,6 @@ else
 
 app.UseFastEndpoints();
 
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/healthz");
 
 app.Run();
