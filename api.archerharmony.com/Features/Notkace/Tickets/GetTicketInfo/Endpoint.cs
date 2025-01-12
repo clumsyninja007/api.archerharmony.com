@@ -1,8 +1,6 @@
-using api.archerharmony.com.Entities.Context;
-
 namespace api.archerharmony.com.Features.Notkace.Tickets.GetTicketInfo;
 
-public partial class Endpoint(NotkaceContext context) : Endpoint<Request, Response>
+public class Endpoint(IData data) : Endpoint<Request, Response>
 {
     public override void Configure()
     {
@@ -13,20 +11,7 @@ public partial class Endpoint(NotkaceContext context) : Endpoint<Request, Respon
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var info = await context.HdTicketChanges
-            .Where(c => c.HdTicketId == req.Id)
-            .Where(c => !string.IsNullOrEmpty(c.Comment))
-            .Select(c => new Response
-            {
-                Ticket = c.HdTicket.Id,
-                Summary = c.HdTicket.Summary,
-                Comment = CleanComment(c.Comment),
-                Timestamp = c.Timestamp,
-                Commenter = c.User.FullName,
-                OwnersOnly = c.OwnersOnly
-            })
-            .OrderByDescending(c => c.Timestamp)
-            .FirstOrDefaultAsync(ct);
+        var info = await data.GetTicketInfo(req.Id, ct);
 
         if (info is null)
         {
@@ -36,19 +21,4 @@ public partial class Endpoint(NotkaceContext context) : Endpoint<Request, Respon
         
         Response = info;
     }
-    
-    private static string? CleanComment(string? comment)
-    {
-        if (string.IsNullOrEmpty(comment))
-        {
-            return comment;
-        }
-        
-        comment = comment.Replace("/packages/hd_attachments", new Uri("http://cty-k1k/packages/hd_attachments").ToString());
-        comment = MyRegex().Replace(comment, "");
-        return comment;
-    }
-
-    [System.Text.RegularExpressions.GeneratedRegex(@"<p>\s*</p>")]
-    private static partial System.Text.RegularExpressions.Regex MyRegex();
 }
