@@ -22,6 +22,7 @@ public static class TelegramBotExtensions
             BotToken = botToken
         };
 
+        builder.Services.AddSingleton(botConfig);
         var client = botConfig.BuildBotClient();
         builder.Services.AddSingleton(client);
         return builder;
