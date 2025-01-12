@@ -1,37 +1,37 @@
-﻿using Microsoft.Extensions.Logging;
 using System.IO;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace api.archerharmony.com.Services;
+namespace api.archerharmony.com.Features.TelegramBot.PostMessage;
 
-public class UpdateService : IUpdateService
+public interface IService
 {
-    private readonly IBotService _botService;
-    private readonly ILogger<UpdateService> _logger;
+    Task EchoAsync(Message message, MessageEntity commandProps);
+    Task SendMessageAsync(ChatId chatId, string message);
+}
 
-    public UpdateService(IBotService botService, ILogger<UpdateService> logger)
-    {
-        _botService = botService;
-        _logger = logger;
-    }
-
+[RegisterService<IService>(LifeTime.Scoped)]
+public class Service(
+    ILogger<Service> logger,
+    TelegramBotClient client) : IService
+{
     public async Task EchoAsync(Message message, MessageEntity commandProps)
     {
-        _logger.LogInformation("Received Message from {ChatId}", message.Chat.Id);
+        logger.LogInformation("Received Message from {ChatId}", message.Chat.Id);
 
         switch (message.Type)
         {
             case MessageType.Text:
                 if (string.IsNullOrWhiteSpace(message.Text))
                 {
-                    await _botService.Client.SendMessage(message.Chat.Id, "Message type not supported");
+                    await client.SendMessage(message.Chat.Id, "Message type not supported");
                     break;
                 }
                 
                 // Echo each Message
-                await _botService.Client.SendMessage(
+                await client.SendMessage(
                     message.Chat.Id,
                     message.Text[(commandProps.Offset + commandProps.Length)..].Trim());
                 break;
@@ -42,15 +42,15 @@ public class UpdateService : IUpdateService
 
                 if (string.IsNullOrEmpty(fileId))
                 {
-                    await _botService.Client.SendMessage(message.Chat.Id, "File not found");
+                    await client.SendMessage(message.Chat.Id, "File not found");
                     break;
                 }
                 
-                var file = await _botService.Client.GetFile(fileId);
+                var file = await client.GetFile(fileId);
 
                 if (string.IsNullOrEmpty(file.FilePath))
                 {
-                    await _botService.Client.SendMessage(message.Chat.Id, "File not found");
+                    await client.SendMessage(message.Chat.Id, "File not found");
                     break;
                 }
                 
@@ -58,25 +58,20 @@ public class UpdateService : IUpdateService
 
                 await using (var saveImageStream = File.Open(filename, FileMode.Create))
                 {
-                    await _botService.Client.DownloadFile(file.FilePath, saveImageStream);
+                    await client.DownloadFile(file.FilePath, saveImageStream);
                 }
 
-                await _botService.Client.SendMessage(message.Chat.Id, "Thx for the Pics");
+                await client.SendMessage(message.Chat.Id, "Thx for the Pics");
                 break;
             }
             default:
-                await _botService.Client.SendMessage(message.Chat.Id, "Message type not supported");
+                await client.SendMessage(message.Chat.Id, "Message type not supported");
                 break;
         }
     }
 
-    public async Task WaterReminderAsync(ChatId chatId)
-    {
-        await _botService.Client.SendMessage(chatId, "Drink some water");
-    }
-
     public async Task SendMessageAsync(ChatId chatId, string message)
     {
-        await _botService.Client.SendMessage(chatId, message);
+        await client.SendMessage(chatId, message);
     }
 }

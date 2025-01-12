@@ -1,3 +1,4 @@
+using api.archerharmony.com.Entities.Context;
 using api.archerharmony.com.Extensions;
 
 namespace api.archerharmony.com.Features.Notkace.Tickets.GetTickets;

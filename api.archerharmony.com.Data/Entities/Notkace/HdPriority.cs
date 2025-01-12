@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace api.archerharmony.com.Entities.Notkace;
+﻿namespace api.archerharmony.com.Entities.Entities.Notkace;
 
 public partial class HdPriority
 {

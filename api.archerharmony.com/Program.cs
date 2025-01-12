@@ -1,8 +1,6 @@
-using System;
-using api.archerharmony.com;
+using api.archerharmony.com.Entities.Context;
 using api.archerharmony.com.Extensions;
 using api.archerharmony.com.Features.Health;
-using api.archerharmony.com.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -48,20 +46,7 @@ builder.Services.AddDbContext<NotkaceContext>(options =>
         new MariaDbServerVersion(new Version(10, 4, 12)))
     );
 
-var botToken = builder.GetSecretOrEnvVar("TelegramBot__BotConfiguration__BotToken");
-if (string.IsNullOrEmpty(botToken))
-{
-    throw new Exception("TelegramBot__BotConfiguration__BotToken is required");
-}
-
-var botConfig = new BotConfiguration
-{
-    BotToken = botToken
-};
-builder.Services.AddSingleton(botConfig);
-
-builder.Services.AddScoped<IUpdateService, UpdateService>();
-builder.Services.AddSingleton<IBotService, BotService>();
+builder.AddTelegramBotClient();
 
 builder.Services.AddHttpClient();
 

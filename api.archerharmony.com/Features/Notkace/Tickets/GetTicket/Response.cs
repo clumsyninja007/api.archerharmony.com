@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace api.archerharmony.com.Features.Notkace.Tickets.GetTicket;
+﻿namespace api.archerharmony.com.Features.Notkace.Tickets.GetTicket;
 
 public record Response
 {

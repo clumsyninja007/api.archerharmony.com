@@ -1,4 +1,5 @@
-using api.archerharmony.com.Services;
+using api.archerharmony.com.Configuration;
+using api.archerharmony.com.Entities.Context;
 using Microsoft.Extensions.Options;
 
 namespace api.archerharmony.com.Features.TelegramBot.SendWaterReminders;
@@ -6,7 +7,7 @@ namespace api.archerharmony.com.Features.TelegramBot.SendWaterReminders;
 public class Endpoint(
     IOptions<BotConfiguration> botConfig,
     TelegramBotContext context,
-    IUpdateService updateService)
+    IService service)
     : Endpoint<Request>
 {
     public override void Configure()
@@ -26,6 +27,6 @@ public class Endpoint(
             .Where(c => c.WaterReminder)
             .ToListAsync(ct);
 
-        reminderList.ForEach(r => updateService.WaterReminderAsync(r.ChatId));
+        reminderList.ForEach(r => service.WaterReminderAsync(r.ChatId));
     }
 }

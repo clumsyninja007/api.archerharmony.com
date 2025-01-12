@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace api.archerharmony.com.Extensions;
+﻿namespace api.archerharmony.com.Extensions;
 
 public class PaginatedList<T> : List<T>
 {

@@ -1,6 +1,7 @@
 using System.Net.Http;
+using api.archerharmony.com.Configuration;
+using api.archerharmony.com.Entities.Context;
 using api.archerharmony.com.Features.TelegramBot.Shared;
-using api.archerharmony.com.Services;
 using Microsoft.Extensions.Options;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -10,8 +11,8 @@ namespace api.archerharmony.com.Features.TelegramBot.PostMessage;
 public class Endpoint(
     IOptions<BotConfiguration> botConfig,
     TelegramBotContext context,
-    IUpdateService updateService,
-    IHttpClientFactory clientFactory)
+    IHttpClientFactory clientFactory,
+    IService service)
     : Endpoint<Request>
 {
     public override void Configure()
@@ -30,6 +31,7 @@ public class Endpoint(
         if (req.Update.Type == UpdateType.Message)
         {
             var message = req.Update.Message;
+            
             ChatId chatId = message.Chat.Id;
 
             // if the message is a command
@@ -75,17 +77,17 @@ public class Endpoint(
                         {
                             chat.WaterReminder = value;
                             await context.SaveChangesAsync(ct);
-                            await updateService.SendMessageAsync(chatId, $"Water notifications {msgText}");
+                            await service.SendMessageAsync(chatId, $"Water notifications {msgText}");
                         }
                         else
                         {
-                            await updateService.SendMessageAsync(chatId, $"Water notifications already {msgText}");
+                            await service.SendMessageAsync(chatId, $"Water notifications already {msgText}");
                         }
 
                         break;
                     }
                     case "/echo":
-                        await updateService.EchoAsync(message, commandProps);
+                        await service.EchoAsync(message, commandProps);
                         break;
                     case "/joke":
                     {
@@ -100,11 +102,11 @@ public class Endpoint(
                         {
                             var joke = await response.Content.ReadAsStringAsync(ct);
 
-                            await updateService.SendMessageAsync(chatId, joke);
+                            await service.SendMessageAsync(chatId, joke);
                         }
                         else
                         {
-                            await updateService.SendMessageAsync(chatId, "Error getting joke :(");
+                            await service.SendMessageAsync(chatId, "Error getting joke :(");
                         }
 
                         client.Dispose();

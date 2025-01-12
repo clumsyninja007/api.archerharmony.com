@@ -1,3 +1,5 @@
+using api.archerharmony.com.Entities.Context;
+
 namespace api.archerharmony.com.Features.Notkace.Tickets.GetTicket;
 
 public class Endpoint(NotkaceContext context) : Endpoint<Request, Response>

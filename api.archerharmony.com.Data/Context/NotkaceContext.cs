@@ -1,8 +1,9 @@
-﻿using api.archerharmony.com.Entities.Notkace;
+﻿using api.archerharmony.com.Entities.Entities.Notkace;
+using Microsoft.EntityFrameworkCore;
 
-namespace api.archerharmony.com.Context;
+namespace api.archerharmony.com.Entities.Context;
 
-public partial class NotkaceContext : Microsoft.EntityFrameworkCore.DbContext
+public partial class NotkaceContext : DbContext
 {
     public NotkaceContext()
     {

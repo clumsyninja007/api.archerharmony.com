@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace api.archerharmony.com.Entities.Telegram;
+﻿namespace api.archerharmony.com.Entities.Entities.Telegram;
 
 public partial class ChatTracker
 {

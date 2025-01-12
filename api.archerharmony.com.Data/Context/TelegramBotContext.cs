@@ -1,6 +1,7 @@
-﻿using api.archerharmony.com.Entities.Telegram;
+﻿using api.archerharmony.com.Entities.Entities.Telegram;
+using Microsoft.EntityFrameworkCore;
 
-namespace api.archerharmony.com.Context;
+namespace api.archerharmony.com.Entities.Context;
 
 public partial class TelegramBotContext : DbContext
 {
