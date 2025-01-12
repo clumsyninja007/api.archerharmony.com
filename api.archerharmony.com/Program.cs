@@ -1,3 +1,4 @@
+using api.archerharmony.com;
 using api.archerharmony.com.Entities.Context;
 using api.archerharmony.com.Extensions;
 using api.archerharmony.com.Features.Health;
@@ -48,9 +49,9 @@ builder.Services.AddDbContext<NotkaceContext>(options =>
 
 builder.AddTelegramBotClient();
 
-builder.Services.AddHttpClient();
-
-builder.Services.AddFastEndpoints();
+builder.Services.AddHttpClient()
+    .AddFastEndpoints()
+    .RegisterServicesFromapiarcherharmonycom(); // FE source generated services
 
 var app = builder.Build();
 

@@ -1,9 +1,6 @@
-using api.archerharmony.com.Entities.Context;
-using api.archerharmony.com.Entities.Entities.Notkace;
-
 namespace api.archerharmony.com.Features.Notkace.Users.GetOwners;
 
-public class Endpoint(NotkaceContext context) : EndpointWithoutRequest<List<User>>
+public class Endpoint(IData data) : EndpointWithoutRequest<List<Response>>
 {
     public override void Configure()
     {
@@ -14,18 +11,11 @@ public class Endpoint(NotkaceContext context) : EndpointWithoutRequest<List<User
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var users = await context.Users
-            .AsNoTracking()
-            .Where(u => u.RoleId == 5)
-            .OrderBy(u => u.FullName)
-            .ToListAsync(ct);
+        Response = await data.GetOwners(ct);
 
-        if (users.Count == 0)
+        if (Response.Count == 0)
         {
             await SendNotFoundAsync(ct);
-            return;
         }
-        
-        Response = users;
     }
 }

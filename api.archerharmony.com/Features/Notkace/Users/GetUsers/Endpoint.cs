@@ -1,9 +1,6 @@
-using api.archerharmony.com.Entities.Context;
-using api.archerharmony.com.Entities.Entities.Notkace;
-
 namespace api.archerharmony.com.Features.Notkace.Users.GetUsers;
 
-public class Endpoint(NotkaceContext context) : EndpointWithoutRequest<List<User>>
+public class Endpoint(IData data) : EndpointWithoutRequest<List<Response>>
 {
     public override void Configure()
     {
@@ -14,16 +11,11 @@ public class Endpoint(NotkaceContext context) : EndpointWithoutRequest<List<User
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var users = await context.Users
-            .AsNoTracking()
-            .ToListAsync(ct);
-
-        if (users.Count == 0)
+        Response = await data.GetUsers(ct);
+        
+        if (Response.Count == 0)
         {
             await SendNoContentAsync(ct);
-            return;
         }
-
-        Response = users;
     }
 }

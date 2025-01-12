@@ -1,9 +1,6 @@
-using api.archerharmony.com.Entities.Context;
-using api.archerharmony.com.Entities.Entities.Notkace;
-
 namespace api.archerharmony.com.Features.Notkace.Users.GetUser;
 
-public class Endpoint(NotkaceContext context) : Endpoint<Request, User>
+public class Endpoint(IData data) : Endpoint<Request, Response>
 {
     public override void Configure()
     {
@@ -14,11 +11,9 @@ public class Endpoint(NotkaceContext context) : Endpoint<Request, User>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var user = await context.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == req.Id, ct);
+        var user = await data.GetUser(req, ct);
 
-        if (user == null)
+        if (user is null)
         {
             await SendNoContentAsync(ct);
             return;
