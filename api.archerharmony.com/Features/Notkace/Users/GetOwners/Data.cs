@@ -15,8 +15,8 @@ public class Data(NotkaceContext context) : IData
         return context.Users
             .Where(u => u.RoleId == 5)
             .Where(u => u.FullName != null)
-            .Select(u => new Response(u.FullName))
             .OrderBy(u => u.FullName)
+            .Select(u => new Response(u.FullName))
             .ToListAsync(ct);
     }
 }
