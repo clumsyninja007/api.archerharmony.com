@@ -14,8 +14,8 @@ public class Data(NotkaceContext context) : IData
     {
         return context.Assets
             .Where(a => id == null || a.AssetTypeId == id)
-            .Select(a => new Response(a.Id, a.Name))
             .OrderBy(a => a.Name)
+            .Select(a => new Response(a.Id, a.Name))
             .ToListAsync(ct);
     }
 }
