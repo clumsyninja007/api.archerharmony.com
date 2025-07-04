@@ -28,9 +28,11 @@ public class Endpoint(
             return;
         }
 
-        if (req.Update.Type == UpdateType.Message)
+        var update = req.Update;
+
+        if (update.Type == UpdateType.Message)
         {
-            var message = req.Update.Message;
+            var message = update.Message;
             
             ChatId chatId = message.Chat.Id;
 
