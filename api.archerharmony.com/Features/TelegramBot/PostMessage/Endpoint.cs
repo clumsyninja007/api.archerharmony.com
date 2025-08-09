@@ -24,7 +24,7 @@ public class Endpoint(
     {
         if (req.Token != botConfig.Value.BotToken)
         {
-            await SendUnauthorizedAsync(ct);
+            await Send.UnauthorizedAsync(ct);
             return;
         }
 

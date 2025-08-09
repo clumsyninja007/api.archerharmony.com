@@ -15,7 +15,7 @@ public class Endpoint(IData data) : Endpoint<Request, Response>
 
         if (Response.Count == 0)
         {
-            await SendNoContentAsync(ct);
+            await Send.NoContentAsync(ct);
         }
     }
 }

@@ -15,7 +15,7 @@ public class Endpoint(IData data) : Endpoint<Request, Response>
 
         if (ticket is null)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
             return;
         }
 

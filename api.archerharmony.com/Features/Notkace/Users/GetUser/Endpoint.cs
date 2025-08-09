@@ -15,7 +15,7 @@ public class Endpoint(IData data) : Endpoint<Request, Response>
 
         if (user is null)
         {
-            await SendNoContentAsync(ct);
+            await Send.NoContentAsync(ct);
             return;
         }
 

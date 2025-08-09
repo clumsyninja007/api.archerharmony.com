@@ -15,7 +15,7 @@ public class Endpoint(IData data) : EndpointWithoutRequest<List<Response>>
 
         if (Response.Count == 0)
         {
-            await SendNotFoundAsync(ct);
+            await Send.NotFoundAsync(ct);
         }
     }
 }
