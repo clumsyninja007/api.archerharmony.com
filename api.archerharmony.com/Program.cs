@@ -1,7 +1,10 @@
+using System.Reflection;
 using api.archerharmony.com;
 using api.archerharmony.com.Entities.Context;
+using api.archerharmony.com.Entities.Entities;
 using api.archerharmony.com.Extensions;
 using api.archerharmony.com.Features.Health;
+using DbUp;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,15 +17,36 @@ const string prodCors = "prodPolicy";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(devCors, policy =>
-        policy.WithOrigins("http://127.0.0.1:8080", "http://localhost:8080")
+        policy.WithOrigins("http://127.0.0.1:8080", "http://localhost:8080", "http://localhost:5173")
             .AllowAnyMethod());
     options.AddPolicy(prodCors, policy =>
-        policy.WithOrigins("https://notkace.archerharmony.com")
+        policy.WithOrigins("https://notkace.archerharmony.com", "https://archer.hoelterling.com")
             .AllowAnyMethod());
 });
 
 builder.Services.AddHealthChecks()
     .AddCheck<DatabaseHealthCheck>("database_health_check");
+
+var connectionString = builder.GetSecretOrEnvVar("ConnectionStrings__Hoelterling");
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new Exception("ConnectionStrings__Hoelterling is required");
+}
+EnsureDatabase.For.MySqlDatabase(connectionString);
+
+var upgrader =
+    DeployChanges.To
+        .MySqlDatabase(connectionString)
+        .WithScriptsEmbeddedInAssembly(typeof(DatabaseType).Assembly)
+        .LogToConsole()
+        .Build();
+
+var result = upgrader.PerformUpgrade();
+
+if (!result.Successful)
+{
+    throw new Exception("Failed to upgrade database", result.Error);
+}
 
 var telegramBotConnString = builder.GetSecretOrEnvVar("ConnectionStrings__TelegramBot");
 if (string.IsNullOrEmpty(telegramBotConnString))
@@ -46,6 +70,14 @@ builder.Services.AddDbContext<NotkaceContext>(options =>
     options.UseMySql(notkaceConnString,
         new MariaDbServerVersion(new Version(10, 4, 12)))
     );
+
+builder.Services.AddSingleton<IDatabaseConnectionFactory>(new DatabaseConnectionFactory(
+    new Dictionary<DatabaseType, string>
+    {
+        { DatabaseType.Hoelterling, connectionString },
+        { DatabaseType.TelegramBot, telegramBotConnString },
+        { DatabaseType.Notkace, notkaceConnString }
+    }));
 
 builder.AddTelegramBotClient();
 

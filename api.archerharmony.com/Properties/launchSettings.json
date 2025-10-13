@@ -11,7 +11,7 @@
   "profiles": {
     "api.archerharmony.com": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "users/owners",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
