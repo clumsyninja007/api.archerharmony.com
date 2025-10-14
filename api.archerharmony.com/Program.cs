@@ -19,7 +19,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://127.0.0.1:8080", "http://localhost:8080", "http://localhost:5173")
             .AllowAnyMethod());
     options.AddPolicy(prodCors, policy =>
-        policy.WithOrigins("https://notkace.archerharmony.com", "https://archer.hoelterling.com")
+        policy.WithOrigins("https://notkace.archerharmony.com", "https://archer.hoelterling.me")
             .AllowAnyMethod());
 });
 
