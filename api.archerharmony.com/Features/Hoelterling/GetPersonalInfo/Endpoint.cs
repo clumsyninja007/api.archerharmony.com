@@ -4,13 +4,13 @@ public class Endpoint(IData data) : Endpoint<Request, Response>
 {
     public override void Configure()
     {
-        Get("/hoelterling/personal/{id}");
-        AllowAnonymous();
+        Get("person/{id}");
+        Group<HoelterlingGroup>();
     }
 
-    public override async Task HandleAsync(Request request, CancellationToken ct)
+    public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var personalInfo = await data.GetPersonalInfo(request.Id);
+        var personalInfo = await data.GetPersonalInfo(req.Id);
 
         if (personalInfo is null)
         {
