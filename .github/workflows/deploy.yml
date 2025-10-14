@@ -25,7 +25,9 @@ jobs:
         run: docker build -t api.archerharmony.com:latest .
 
       - name: Save Docker image as tarball
-        run: docker save api.archerharmony.com:latest -o api.tar
+        run: |
+          docker save api.archerharmony.com:latest -o api.tar
+          chmod +r api.tar
 
       - name: Copy image to server
         uses: appleboy/scp-action@v0.1.7
@@ -35,7 +37,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: "api.tar"
           target: "${{ secrets.PROJECT_PATH }}"
-
+      
       - name: SSH and deploy
         uses: appleboy/ssh-action@v0.1.10
         with:
