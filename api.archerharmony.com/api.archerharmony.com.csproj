@@ -9,18 +9,18 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="dbup-mysql" Version="5.0.41" />
-    <PackageReference Include="FastEndpoints" Version="7.0.1" />
-    <PackageReference Include="FastEndpoints.Generator" Version="7.0.1">
+    <PackageReference Include="dbup-mysql" Version="6.0.4" />
+    <PackageReference Include="FastEndpoints" Version="7.1.0" />
+    <PackageReference Include="FastEndpoints.Generator" Version="7.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="HttpToSocks5Proxy" Version="1.4.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Telegram.Bot" Version="22.7.2" />
+    <PackageReference Include="Telegram.Bot" Version="22.7.4" />
   </ItemGroup>
 
   <ItemGroup>
