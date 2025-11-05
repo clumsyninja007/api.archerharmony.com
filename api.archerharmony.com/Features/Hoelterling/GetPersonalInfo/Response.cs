@@ -1,3 +1,6 @@
 namespace api.archerharmony.com.Features.Hoelterling.GetPersonalInfo;
 
-public record Response(string Name, string Title);
+public record Response : Person
+{
+    public List<ContactInfo>? ContactInfo { get; init; }
+}

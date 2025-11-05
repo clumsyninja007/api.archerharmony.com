@@ -10,7 +10,10 @@ public class Endpoint(IData data) : Endpoint<Request, Response>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var personalInfo = await data.GetPersonalInfo(req.Id);
+        var personalInfoTask = data.GetPersonalInfo(req.Id);
+        var contactInfoTask = data.GetContactInfo(req.Id);
+        
+        var personalInfo = await personalInfoTask;
 
         if (personalInfo is null)
         {
@@ -18,6 +21,15 @@ public class Endpoint(IData data) : Endpoint<Request, Response>
             return;
         }
         
-        await Send.OkAsync(personalInfo, ct);
+        var contactInfo = await contactInfoTask;
+        
+        var response = new Response
+        {
+            Name = personalInfo.Name,
+            Title = personalInfo.Title,
+            ContactInfo = contactInfo.Count > 0 ? contactInfo : null
+        };
+        
+        await Send.OkAsync(response, ct);
     }
 }
