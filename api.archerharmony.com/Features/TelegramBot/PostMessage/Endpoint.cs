@@ -34,19 +34,19 @@ public class Endpoint(
         {
             var message = update.Message;
             
-            ChatId chatId = message.Chat.Id;
+            ChatId chatId = message!.Chat.Id;
 
             // if the message is a command
             if (message.EntityValues != null && message.EntityValues.Any())
             {
                 var command = message.EntityValues.First();
-                var commandProps = message.Entities.First();
+                var commandProps = message.Entities!.First();
 
                 switch (command)
                 {
                     case "/water":
                     {
-                        var commandText = message.Text.Substring(commandProps.Offset + commandProps.Length).Trim().ToLower();
+                        var commandText = message.Text!.Substring(commandProps.Offset + commandProps.Length).Trim().ToLower();
                         bool value;
                         string msgText;
 

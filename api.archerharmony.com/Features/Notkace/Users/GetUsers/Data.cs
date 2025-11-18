@@ -14,7 +14,7 @@ public class Data(NotkaceContext context) : IData
     {
         return context.Users
             .Where(x => x.FullName != null)
-            .Select(x => new Response(x.FullName))
+            .Select(x => new Response(x.FullName!))
             .ToListAsync(ct);
     }
 }

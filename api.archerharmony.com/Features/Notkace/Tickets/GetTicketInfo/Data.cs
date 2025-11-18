@@ -21,7 +21,7 @@ public partial class Data(NotkaceContext context) : IData
                 Summary = c.HdTicket.Summary,
                 Comment = CleanComment(c.Comment),
                 Timestamp = c.Timestamp,
-                Commenter = c.User.FullName,
+                Commenter = c.User!.FullName,
                 OwnersOnly = c.OwnersOnly
             })
             .OrderByDescending(c => c.Timestamp)

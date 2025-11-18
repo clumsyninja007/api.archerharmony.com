@@ -14,7 +14,7 @@ public class Data(NotkaceContext context) : IData
     {
         return context.Users
             .Where(x => x.Id == req.Id)
-            .Select(x => new Response(x.FullName))
+            .Select(x => new Response(x.FullName!))
             .FirstOrDefaultAsync(ct);
     }
 }

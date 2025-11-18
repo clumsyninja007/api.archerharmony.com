@@ -6,7 +6,7 @@ namespace api.archerharmony.com.Features.Health;
 
 public class DatabaseHealthCheck(IServiceProvider serviceProvider) : IHealthCheck
 {
-    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
+    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
         using var scope = serviceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<NotkaceContext>();
