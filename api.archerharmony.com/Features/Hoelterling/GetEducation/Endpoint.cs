@@ -10,7 +10,7 @@ public class Endpoint(IData data) : Endpoint<Request, IEnumerable<EducationRecor
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var education = await data.GetEducation(req.PersonId);
+        var education = await data.GetEducation(req.PersonId, ct);
 
         if (education.Count == 0)
         {

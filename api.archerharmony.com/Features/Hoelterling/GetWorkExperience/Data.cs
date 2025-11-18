@@ -1,17 +1,17 @@
 using api.archerharmony.com.Entities.Entities;
-using Dapper;
+using api.archerharmony.com.Extensions;
 
 namespace api.archerharmony.com.Features.Hoelterling.GetWorkExperience;
 
 public interface IData
 {
-    public Task<List<WorkExperience>> GetWorkExperiences(int personId);
+    public Task<List<WorkExperience>> GetWorkExperiences(int personId, CancellationToken ct = default);
 }
 
 [RegisterService<IData>(LifeTime.Scoped)]
 public class Data(IDatabaseConnectionFactory databaseConnectionFactory) : IData
 {
-    public async Task<List<WorkExperience>> GetWorkExperiences(int personId)
+    public async Task<List<WorkExperience>> GetWorkExperiences(int personId,  CancellationToken ct = default)
     {
         await using var conn = databaseConnectionFactory.CreateConnection(DatabaseType.Hoelterling);
         
@@ -36,7 +36,7 @@ public class Data(IDatabaseConnectionFactory databaseConnectionFactory) : IData
             );
             """;
 
-        await using var multi = await conn.QueryMultipleAsync(sql, new { PersonId = personId });
+        await using var multi = await conn.QueryMultipleAsync(sql, new { PersonId = personId }, cancellationToken: ct);
 
         var experiences = (await multi.ReadAsync<WorkExperienceRow>()).ToList();
         var skills = (await multi.ReadAsync<SkillRow>()).ToList();

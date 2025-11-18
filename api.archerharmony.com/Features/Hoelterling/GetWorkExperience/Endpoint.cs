@@ -10,7 +10,7 @@ public class Endpoint(IData data) : Endpoint<Request, IEnumerable<WorkExperience
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var experience = await data.GetWorkExperiences(req.PersonId);
+        var experience = await data.GetWorkExperiences(req.PersonId, ct);
 
         if (experience.Count == 0)
         {

@@ -10,8 +10,8 @@ public class Endpoint(IData data) : Endpoint<Request, Response>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var personalInfoTask = data.GetPersonalInfo(req.Id);
-        var contactInfoTask = data.GetContactInfo(req.Id);
+        var personalInfoTask = data.GetPersonalInfo(req.Id, ct);
+        var contactInfoTask = data.GetContactInfo(req.Id, ct);
         
         var personalInfo = await personalInfoTask;
 
