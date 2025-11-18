@@ -13,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 const string devCors = "devPolicy";
 const string prodCors = "prodPolicy";
 
+var mariaDbVersion = new Version(12, 0, 2);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(devCors, policy =>
@@ -56,7 +58,7 @@ if (string.IsNullOrEmpty(telegramBotConnString))
 builder.Services.AddDbContext<TelegramBotContext>(options =>
     options.UseMySql(
         telegramBotConnString,
-        new MariaDbServerVersion(new Version(10, 4, 12)))
+        new MariaDbServerVersion(mariaDbVersion))
     );
 
 var notkaceConnString = builder.GetSecretOrEnvVar("ConnectionStrings__Notkace");
@@ -67,7 +69,7 @@ if (string.IsNullOrEmpty(notkaceConnString))
 
 builder.Services.AddDbContext<NotkaceContext>(options =>
     options.UseMySql(notkaceConnString,
-        new MariaDbServerVersion(new Version(10, 4, 12)))
+        new MariaDbServerVersion(mariaDbVersion))
     );
 
 builder.Services.AddSingleton<IDatabaseConnectionFactory>(new DatabaseConnectionFactory(
