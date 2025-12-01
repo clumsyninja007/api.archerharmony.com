@@ -5,38 +5,44 @@ namespace api.archerharmony.com.Features.Hoelterling.GetWorkExperience;
 
 public interface IData
 {
-    public Task<List<WorkExperience>> GetWorkExperiences(int personId, CancellationToken ct = default);
+    public Task<List<WorkExperience>> GetWorkExperiences(int personId, string language, CancellationToken ct = default);
 }
 
 [RegisterService<IData>(LifeTime.Scoped)]
 public class Data(IDatabaseConnectionFactory databaseConnectionFactory) : IData
 {
-    public async Task<List<WorkExperience>> GetWorkExperiences(int personId,  CancellationToken ct = default)
+    public async Task<List<WorkExperience>> GetWorkExperiences(int personId, string language, CancellationToken ct = default)
     {
         await using var conn = databaseConnectionFactory.CreateConnection(DatabaseType.Hoelterling);
-        
+
         const string sql =
             """
-            SELECT 
-                id,
-                title,
-                company,
-                location,
-                start_date AS StartDate,
-                end_date AS EndDate
-            FROM work_experience
-            WHERE person_id = @PersonId;
+            SELECT
+                we.id,
+                COALESCE(wel.title, we.title) AS title,
+                COALESCE(wel.company, we.company) AS company,
+                COALESCE(wel.location, we.location) AS location,
+                we.start_date AS StartDate,
+                we.end_date AS EndDate
+            FROM work_experience we
+            LEFT JOIN work_experience_localized wel
+                ON we.id = wel.work_experience_id
+                AND wel.language_code = @Language
+            WHERE we.person_id = @PersonId;
 
-            SELECT 
-                work_experience_id AS WorkExperienceId,
-                skill
-            FROM work_experience_skills
-            WHERE work_experience_id IN (
+            SELECT
+                wes.work_experience_id AS WorkExperienceId,
+                COALESCE(wesl.skill, wes.skill) AS skill
+            FROM work_experience_skills wes
+            LEFT JOIN work_experience_skills_localized wesl
+                ON wes.id = wesl.work_experience_skill_id
+                AND wesl.language_code = @Language
+            WHERE wes.work_experience_id IN (
                 SELECT id FROM work_experience WHERE person_id = @PersonId
             );
             """;
 
-        await using var multi = await conn.QueryMultipleAsync(sql, new { PersonId = personId }, cancellationToken: ct);
+        await using var multi = await conn.QueryMultipleAsync(sql, new { PersonId = personId, Language = language }, cancellationToken: ct);
 
         var experiences = (await multi.ReadAsync<WorkExperienceRow>()).ToList();
         var skills = (await multi.ReadAsync<SkillRow>()).ToList();

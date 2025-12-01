@@ -1,3 +1,5 @@
+using api.archerharmony.com.Extensions;
+
 namespace api.archerharmony.com.Features.Hoelterling.GetPersonalInfo;
 
 public class Endpoint(IData data) : Endpoint<Request, Response>
@@ -10,9 +12,11 @@ public class Endpoint(IData data) : Endpoint<Request, Response>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var personalInfoTask = data.GetPersonalInfo(req.Id, ct);
-        var contactInfoTask = data.GetContactInfo(req.Id, ct);
-        
+        var language = HttpContext.Request.GetLanguage();
+
+        var personalInfoTask = data.GetPersonalInfo(req.Id, language, ct);
+        var contactInfoTask = data.GetContactInfo(req.Id, language, ct);
+
         var personalInfo = await personalInfoTask;
 
         if (personalInfo is null)
@@ -20,16 +24,17 @@ public class Endpoint(IData data) : Endpoint<Request, Response>
             await Send.NoContentAsync(ct);
             return;
         }
-        
+
         var contactInfo = await contactInfoTask;
-        
+
         var response = new Response
         {
             Name = personalInfo.Name,
             Title = personalInfo.Title,
+            HeroDescription = personalInfo.HeroDescription,
             ContactInfo = contactInfo.Count > 0 ? contactInfo : null
         };
-        
+
         await Send.OkAsync(response, ct);
     }
 }
