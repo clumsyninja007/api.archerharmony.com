@@ -55,6 +55,15 @@ public static class DapperExtensions
             return connection.ExecuteAsync(command);
         }
 
+        public Task<int> ExecuteAsync(string sql,
+            object? param = null,
+            IDbTransaction? transaction = null,
+            CancellationToken cancellationToken = default)
+        {
+            var command = new CommandDefinition(sql, param, transaction, cancellationToken: cancellationToken);
+            return connection.ExecuteAsync(command);
+        }
+
         public Task<T?> ExecuteScalarAsync<T>(string sql,
             object? param = null,
             CancellationToken cancellationToken = default)
