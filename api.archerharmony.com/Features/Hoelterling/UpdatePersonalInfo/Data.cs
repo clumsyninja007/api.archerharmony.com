@@ -1,21 +1,21 @@
 using api.archerharmony.com.Entities.Entities;
-using api.archerharmony.com.Extensions;
+using Dapper;
 
 namespace api.archerharmony.com.Features.Hoelterling.UpdatePersonalInfo;
 
 public interface IData
 {
-    Task UpdatePersonalInfo(int personId, PersonalInfoData en, PersonalInfoData de, string updatedBy, CancellationToken ct = default);
+    Task UpdatePersonalInfo(int personId, PersonalInfoData en, PersonalInfoData de, string updatedBy);
 }
 
 [RegisterService<IData>(LifeTime.Scoped)]
 public class Data(IDatabaseConnectionFactory connectionFactory) : IData
 {
-    public async Task UpdatePersonalInfo(int personId, PersonalInfoData en, PersonalInfoData de, string updatedBy, CancellationToken ct = default)
+    public async Task UpdatePersonalInfo(int personId, PersonalInfoData en, PersonalInfoData de, string updatedBy)
     {
         await using var conn = connectionFactory.CreateConnection(DatabaseType.Hoelterling);
-        await conn.OpenAsync(ct);
-        await using var transaction = await conn.BeginTransactionAsync(ct);
+        await conn.OpenAsync();
+        await using var transaction = await conn.BeginTransactionAsync();
 
         try
         {
@@ -37,7 +37,7 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
                 Title = en.Title,
                 HeroDescription = en.HeroDescription,
                 UpdatedBy = updatedBy
-            }, transaction, cancellationToken: ct);
+            }, transaction);
 
             // Upsert localized data for English
             const string upsertEn = """
@@ -56,7 +56,7 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
                 Title = en.Title,
                 HeroDescription = en.HeroDescription,
                 UpdatedBy = updatedBy
-            }, transaction, cancellationToken: ct);
+            }, transaction);
 
             // Upsert localized data for German
             const string upsertDe = """
@@ -75,13 +75,13 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
                 Title = de.Title,
                 HeroDescription = de.HeroDescription,
                 UpdatedBy = updatedBy
-            }, transaction, cancellationToken: ct);
+            }, transaction);
 
-            await transaction.CommitAsync(ct);
+            await transaction.CommitAsync();
         }
         catch
         {
-            await transaction.RollbackAsync(ct);
+            await transaction.RollbackAsync();
             throw;
         }
     }

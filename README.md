@@ -1,6 +1,6 @@
 # Archer Harmony API
 
-A multi-tenant .NET 9 ASP.NET Core Web API serving multiple domains and products using FastEndpoints and a feature-based architecture.
+A multi-tenant .NET 10 ASP.NET Core Web API serving multiple domains and products using FastEndpoints and a feature-based architecture.
 
 ## Overview
 
@@ -11,7 +11,7 @@ This API serves as the backend for multiple applications:
 
 ## Technology Stack
 
-- **.NET 9** - ASP.NET Core Web API
+- **.NET 10** - ASP.NET Core Web API
 - **FastEndpoints** - Minimal API routing framework
 - **Entity Framework Core** - ORM for TelegramBot and Notkace databases
 - **Dapper** - Micro-ORM for complex queries (Hoelterling)
@@ -40,7 +40,7 @@ api.archerharmony.com/
 
 ### Prerequisites
 
-- .NET 9 SDK
+- .NET 10 SDK
 - MySQL/MariaDB server (or Docker for databases)
 - Docker (optional, for containerized deployment)
 

@@ -1,5 +1,5 @@
 using api.archerharmony.com.Entities.Entities;
-using api.archerharmony.com.Extensions;
+using Dapper;
 
 namespace api.archerharmony.com.Features.Hoelterling.GetWorkExperience;
 
@@ -42,7 +42,8 @@ public class Data(IDatabaseConnectionFactory databaseConnectionFactory) : IData
             );
             """;
 
-        await using var multi = await conn.QueryMultipleAsync(sql, new { PersonId = personId, Language = language }, cancellationToken: ct);
+        var command = new CommandDefinition(sql, new { PersonId = personId, Language = language }, cancellationToken: ct);
+        await using var multi = await conn.QueryMultipleAsync(command);
 
         var experiences = (await multi.ReadAsync<WorkExperienceRow>()).ToList();
         var skills = (await multi.ReadAsync<SkillRow>()).ToList();
@@ -50,6 +51,7 @@ public class Data(IDatabaseConnectionFactory databaseConnectionFactory) : IData
         // join them
         var result = experiences
             .Select(exp => new WorkExperience(
+                exp.Id,
                 exp.Title,
                 exp.Company,
                 exp.Location,

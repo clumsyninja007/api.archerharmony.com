@@ -1,5 +1,5 @@
 using api.archerharmony.com.Entities.Entities;
-using api.archerharmony.com.Extensions;
+using Dapper;
 
 namespace api.archerharmony.com.Features.Hoelterling.GetPersonalInfo;
 
@@ -27,7 +27,8 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
             WHERE p.id = @id
             """;
         await using var conn = connectionFactory.CreateConnection(DatabaseType.Hoelterling);
-        return await conn.QueryFirstOrDefaultAsync<PersonWithDescription>(query, new { id, language }, ct);
+        var command = new CommandDefinition(query, new { id, language }, cancellationToken: ct);
+        return await conn.QueryFirstOrDefaultAsync<PersonWithDescription>(command);
     }
 
     public async Task<List<ContactInfo>> GetContactInfo(int personId, string language, CancellationToken ct = default)
@@ -45,7 +46,8 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
             WHERE c.person_id = @personId
             """;
         await using var conn = connectionFactory.CreateConnection(DatabaseType.Hoelterling);
-        var contact = await conn.QueryAsync<ContactInfo>(query, new { personId, language }, ct);
+        var command = new CommandDefinition(query, new { personId, language }, cancellationToken: ct);
+        var contact = await conn.QueryAsync<ContactInfo>(command);
         return contact.ToList();
     }
 }

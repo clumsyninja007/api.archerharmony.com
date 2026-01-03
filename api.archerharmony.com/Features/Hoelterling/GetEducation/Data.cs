@@ -1,5 +1,5 @@
 using api.archerharmony.com.Entities.Entities;
-using api.archerharmony.com.Extensions;
+using Dapper;
 
 namespace api.archerharmony.com.Features.Hoelterling.GetEducation;
 
@@ -30,7 +30,8 @@ public class Data(IDatabaseConnectionFactory databaseConnectionFactory) : IData
             WHERE e.person_id = @personId
             """;
 
-        var response = await conn.QueryAsync<EducationRecord>(query, new { personId, language }, cancellationToken: ct);
+        var command = new CommandDefinition(query, new { personId, language }, cancellationToken: ct);
+        var response = await conn.QueryAsync<EducationRecord>(command);
         return response.ToList();
     }
 }

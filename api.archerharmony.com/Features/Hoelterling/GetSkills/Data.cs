@@ -1,5 +1,5 @@
 using api.archerharmony.com.Entities.Entities;
-using api.archerharmony.com.Extensions;
+using Dapper;
 
 namespace api.archerharmony.com.Features.Hoelterling.GetSkills;
 
@@ -25,7 +25,8 @@ public class Data(IDatabaseConnectionFactory databaseConnectionFactory) : IData
             WHERE s.person_id = @personId
             """;
 
-        var skills = await conn.QueryAsync<string>(query, new { personId, language }, cancellationToken: ct);
+        var command = new CommandDefinition(query, new { personId, language }, cancellationToken: ct);
+        var skills = await conn.QueryAsync<string>(command);
         return skills.ToList();
     }
 }

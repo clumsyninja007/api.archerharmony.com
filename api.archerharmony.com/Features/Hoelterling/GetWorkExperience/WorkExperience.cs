@@ -1,6 +1,7 @@
 namespace api.archerharmony.com.Features.Hoelterling.GetWorkExperience;
 
 public record WorkExperience(
+    int Id,
     string Title,
     string Company,
     string Location,

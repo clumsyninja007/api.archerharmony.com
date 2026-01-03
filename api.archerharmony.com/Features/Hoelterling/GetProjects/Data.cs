@@ -1,5 +1,5 @@
 using api.archerharmony.com.Entities.Entities;
-using api.archerharmony.com.Extensions;
+using Dapper;
 
 namespace api.archerharmony.com.Features.Hoelterling.GetProjects;
 
@@ -48,7 +48,8 @@ public class Data(IDatabaseConnectionFactory databaseConnectionFactory) : IData
             ORDER BY pt.display_order ASC;
             """;
 
-        await using var multi = await conn.QueryMultipleAsync(sql, new { personId, language }, cancellationToken: ct);
+        var command = new CommandDefinition(sql, new { personId, language }, cancellationToken: ct);
+        await using var multi = await conn.QueryMultipleAsync(command);
 
         var projects = (await multi.ReadAsync<ProjectRow>()).ToList();
         var technologies = (await multi.ReadAsync<TechnologyRow>()).ToList();
