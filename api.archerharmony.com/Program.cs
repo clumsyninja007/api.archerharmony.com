@@ -4,9 +4,11 @@ using api.archerharmony.com.Entities.Entities;
 using api.archerharmony.com.Extensions;
 using api.archerharmony.com.Features.Health;
 using DbUp;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +21,34 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(devCors, policy =>
         policy.WithOrigins("http://127.0.0.1:8080", "http://localhost:8080", "http://localhost:5173")
-            .AllowAnyMethod());
+            .AllowAnyMethod()
+            .AllowAnyHeader());
     options.AddPolicy(prodCors, policy =>
         policy.WithOrigins("https://notkace.archerharmony.com", "https://archer.hoelterling.me")
-            .AllowAnyMethod());
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://cloak.hoelterling.me/realms/portfolio";
+        options.Audience = "account";
+        options.RequireHttpsMetadata = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.FromMinutes(5)
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ContentAdmin", policy =>
+        policy.RequireRole("content-admin"));
 });
 
 builder.Services.AddHealthChecks()
@@ -98,6 +124,9 @@ else
     app.UseCors(prodCors);
     app.UseHsts();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseFastEndpoints();
 
