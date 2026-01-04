@@ -19,10 +19,11 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
 
         try
         {
-            // Update base work_experience table
+            // Update English in base work_experience table
             const string updateBase = """
                 UPDATE work_experience
-                SET company = @Company,
+                SET title = @Title,
+                    company = @Company,
                     location = @Location,
                     start_date = @StartDate,
                     end_date = @EndDate,
@@ -34,6 +35,7 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
             await conn.ExecuteAsync(updateBase, new
             {
                 ExperienceId = experienceId,
+                Title = en.Title,
                 Company = en.Company,
                 Location = en.Location,
                 StartDate = en.StartDate,
@@ -41,29 +43,14 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
                 UpdatedBy = updatedBy
             }, transaction);
 
-            // Upsert localized data for English
-            const string upsertEn = """
-                INSERT INTO work_experience_localized (work_experience_id, language_code, title, updated_by)
-                VALUES (@ExperienceId, 'en', @Title, @UpdatedBy)
-                ON DUPLICATE KEY UPDATE
-                    title = @Title,
-                    updated_by = @UpdatedBy,
-                    updated_at = NOW()
-                """;
-
-            await conn.ExecuteAsync(upsertEn, new
-            {
-                ExperienceId = experienceId,
-                Title = en.Title,
-                UpdatedBy = updatedBy
-            }, transaction);
-
-            // Upsert localized data for German
+            // Upsert German localized data only
             const string upsertDe = """
-                INSERT INTO work_experience_localized (work_experience_id, language_code, title, updated_by)
-                VALUES (@ExperienceId, 'de', @Title, @UpdatedBy)
+                INSERT INTO work_experience_localized (work_experience_id, language_code, title, company, location, updated_by)
+                VALUES (@ExperienceId, 'de', @Title, @Company, @Location, @UpdatedBy)
                 ON DUPLICATE KEY UPDATE
                     title = @Title,
+                    company = @Company,
+                    location = @Location,
                     updated_by = @UpdatedBy,
                     updated_at = NOW()
                 """;
@@ -72,6 +59,8 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
             {
                 ExperienceId = experienceId,
                 Title = de.Title,
+                Company = de.Company,
+                Location = de.Location,
                 UpdatedBy = updatedBy
             }, transaction);
 
@@ -94,45 +83,33 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
             // Insert new skills
             for (var i = 0; i < en.Skills.Count; i++)
             {
+                // Insert English skill into base table
                 const string insertSkill = """
-                    INSERT INTO work_experience_skills (work_experience_id, skill_name, display_order, updated_by, created_at, updated_at)
-                    VALUES (@ExperienceId, @SkillName, @DisplayOrder, @UpdatedBy, NOW(), NOW());
+                    INSERT INTO work_experience_skills (work_experience_id, skill, display_order, updated_by, created_at, updated_at)
+                    VALUES (@ExperienceId, @Skill, @DisplayOrder, @UpdatedBy, NOW(), NOW());
                     SELECT LAST_INSERT_ID();
                     """;
 
                 var skillId = await conn.ExecuteScalarAsync<int>(insertSkill, new
                 {
                     ExperienceId = experienceId,
-                    SkillName = en.Skills[i],
+                    Skill = en.Skills[i],
                     DisplayOrder = i,
                     UpdatedBy = updatedBy
                 }, transaction);
 
-                // Insert English skill localization
-                const string insertSkillEn = """
-                    INSERT INTO work_experience_skills_localized (work_experience_skill_id, language_code, skill_name, updated_by, created_at, updated_at)
-                    VALUES (@SkillId, 'en', @SkillName, @UpdatedBy, NOW(), NOW())
-                    """;
-
-                await conn.ExecuteAsync(insertSkillEn, new
-                {
-                    SkillId = skillId,
-                    SkillName = en.Skills[i],
-                    UpdatedBy = updatedBy
-                }, transaction);
-
-                // Insert German skill localization
+                // Insert German skill localization only
                 if (i < de.Skills.Count)
                 {
                     const string insertSkillDe = """
-                        INSERT INTO work_experience_skills_localized (work_experience_skill_id, language_code, skill_name, updated_by, created_at, updated_at)
-                        VALUES (@SkillId, 'de', @SkillName, @UpdatedBy, NOW(), NOW())
+                        INSERT INTO work_experience_skills_localized (work_experience_skill_id, language_code, skill, updated_by, created_at, updated_at)
+                        VALUES (@SkillId, 'de', @Skill, @UpdatedBy, NOW(), NOW())
                         """;
 
                     await conn.ExecuteAsync(insertSkillDe, new
                     {
                         SkillId = skillId,
-                        SkillName = de.Skills[i],
+                        Skill = de.Skills[i],
                         UpdatedBy = updatedBy
                     }, transaction);
                 }

@@ -32,14 +32,16 @@ public class Data(IDatabaseConnectionFactory databaseConnectionFactory) : IData
 
             SELECT
                 wes.work_experience_id AS WorkExperienceId,
-                COALESCE(wesl.skill, wes.skill) AS skill
+                COALESCE(wesl.skill, wes.skill) AS skill,
+                wes.display_order AS DisplayOrder
             FROM work_experience_skills wes
             LEFT JOIN work_experience_skills_localized wesl
                 ON wes.id = wesl.work_experience_skill_id
                 AND wesl.language_code = @Language
             WHERE wes.work_experience_id IN (
                 SELECT id FROM work_experience WHERE person_id = @PersonId
-            );
+            )
+            ORDER BY wes.display_order;
             """;
 
         var command = new CommandDefinition(sql, new { PersonId = personId, Language = language }, cancellationToken: ct);
@@ -76,4 +78,4 @@ internal record WorkExperienceRow(
     DateTime StartDate,
     DateTime? EndDate);
 
-internal record SkillRow(int WorkExperienceId, string Skill);
+internal record SkillRow(int WorkExperienceId, string Skill, int DisplayOrder);
