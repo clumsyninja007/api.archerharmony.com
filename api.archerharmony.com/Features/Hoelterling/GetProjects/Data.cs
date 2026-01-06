@@ -24,6 +24,7 @@ public class Data(IDatabaseConnectionFactory databaseConnectionFactory) : IData
                 COALESCE(pl.long_description, p.long_description) AS longDescription,
                 p.image_url AS imageUrl,
                 p.live_url AS liveUrl,
+                p.demo_url AS demoUrl,
                 p.github_url AS githubUrl,
                 p.display_order AS displayOrder
             FROM project p
@@ -66,6 +67,7 @@ public class Data(IDatabaseConnectionFactory databaseConnectionFactory) : IData
                     .ToList(),
                 proj.ImageUrl,
                 proj.LiveUrl,
+                proj.DemoUrl,
                 proj.GithubUrl,
                 proj.DisplayOrder
             ))
@@ -82,6 +84,7 @@ internal record ProjectRow(
     string LongDescription,
     string? ImageUrl,
     string? LiveUrl,
+    string? DemoUrl,
     string? GithubUrl,
     int DisplayOrder);
 

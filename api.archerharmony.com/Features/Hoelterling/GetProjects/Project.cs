@@ -8,5 +8,6 @@ public record Project(
     IEnumerable<string> Technologies,
     string? ImageUrl,
     string? LiveUrl,
+    string? DemoUrl,
     string? GithubUrl,
     int DisplayOrder);

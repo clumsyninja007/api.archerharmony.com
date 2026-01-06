@@ -1,5 +1,3 @@
-using FastEndpoints;
-
 namespace api.archerharmony.com.Features.Hoelterling.UpdatePersonalInfo;
 
 public class Endpoint(IData data) : Endpoint<Request>

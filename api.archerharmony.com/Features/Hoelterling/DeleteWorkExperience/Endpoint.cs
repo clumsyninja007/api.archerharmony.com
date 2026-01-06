@@ -1,5 +1,3 @@
-using FastEndpoints;
-
 namespace api.archerharmony.com.Features.Hoelterling.DeleteWorkExperience;
 
 public class Endpoint(IData data) : Endpoint<Request>
