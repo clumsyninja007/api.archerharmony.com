@@ -66,67 +66,122 @@ public class Data(NotkaceContext context) : IData
             query = query.Where(t => t.Location == req.Location);
         }
 
-        var orderedQuery = query.OrderBy(t => 0);
+        IOrderedQueryable<GetTicket.Response> orderedQuery;
 
         if (!string.IsNullOrEmpty(req.Sort))
         {
             var sortFields = new SortFields(req.Sort);
 
-            orderedQuery = sortFields.Fields
-                .Aggregate(orderedQuery, (current, sortField) =>
-                    sortField.Field switch
+            if (sortFields.Fields.Count == 0)
+            {
+                orderedQuery = query.OrderBy(t => t.Owner)
+                    .ThenBy(t => t.PriOrd)
+                    .ThenBy(t => t.StatOrd);
+            }
+            else
+            {
+                var firstField = sortFields.Fields[0];
+                orderedQuery = firstField.Field switch
+                {
+                    "ticket" => firstField.SortDesc
+                        ? query.OrderByDescending(t => t.Ticket)
+                        : query.OrderBy(t => t.Ticket),
+                    "title" => firstField.SortDesc
+                        ? query.OrderByDescending(t => t.Title)
+                        : query.OrderBy(t => t.Title),
+                    "priority" => firstField.SortDesc
+                        ? query.OrderByDescending(t => t.PriOrd)
+                        : query.OrderBy(t => t.PriOrd),
+                    "status" => firstField.SortDesc
+                        ? query.OrderByDescending(t => t.StatOrd)
+                        : query.OrderBy(t => t.StatOrd),
+                    "owner" => firstField.SortDesc
+                        ? query.OrderByDescending(t => t.Owner)
+                        : query.OrderBy(t => t.Owner),
+                    "submitter" => firstField.SortDesc
+                        ? query.OrderByDescending(t => t.Submitter)
+                        : query.OrderBy(t => t.Submitter),
+                    "asset" => firstField.SortDesc
+                        ? query.OrderByDescending(t => t.Asset)
+                        : query.OrderBy(t => t.Asset),
+                    "referredto" => firstField.SortDesc
+                        ? query.OrderByDescending(t => t.ReferredTo)
+                        : query.OrderBy(t => t.ReferredTo),
+                    "dept" => firstField.SortDesc
+                        ? query.OrderByDescending(t => t.Dept)
+                        : query.OrderBy(t => t.Dept),
+                    "location" => firstField.SortDesc
+                        ? query.OrderByDescending(t => t.Location)
+                        : query.OrderBy(t => t.Location),
+                    "created" => firstField.SortDesc
+                        ? query.OrderByDescending(t => t.Created)
+                        : query.OrderBy(t => t.Created),
+                    _ => query.OrderBy(t => 0)
+                };
+
+                for (var i = 1; i < sortFields.Fields.Count; i++)
+                {
+                    var sortField = sortFields.Fields[i];
+                    orderedQuery = sortField.Field switch
                     {
                         "ticket" => sortField.SortDesc
-                            ? current.ThenByDescending(t => t.Ticket)
-                            : current.ThenBy(t => t.Ticket),
+                            ? orderedQuery.ThenByDescending(t => t.Ticket)
+                            : orderedQuery.ThenBy(t => t.Ticket),
                         "title" => sortField.SortDesc
-                            ? current.ThenByDescending(t => t.Title)
-                            : current.ThenBy(t => t.Title),
+                            ? orderedQuery.ThenByDescending(t => t.Title)
+                            : orderedQuery.ThenBy(t => t.Title),
                         "priority" => sortField.SortDesc
-                            ? current.ThenByDescending(t => t.PriOrd)
-                            : current.ThenBy(t => t.PriOrd),
+                            ? orderedQuery.ThenByDescending(t => t.PriOrd)
+                            : orderedQuery.ThenBy(t => t.PriOrd),
                         "status" => sortField.SortDesc
-                            ? current.ThenByDescending(t => t.StatOrd)
-                            : current.ThenBy(t => t.StatOrd),
+                            ? orderedQuery.ThenByDescending(t => t.StatOrd)
+                            : orderedQuery.ThenBy(t => t.StatOrd),
                         "owner" => sortField.SortDesc
-                            ? current.ThenByDescending(t => t.Owner)
-                            : current.ThenBy(t => t.Owner),
+                            ? orderedQuery.ThenByDescending(t => t.Owner)
+                            : orderedQuery.ThenBy(t => t.Owner),
                         "submitter" => sortField.SortDesc
-                            ? current.ThenByDescending(t => t.Submitter)
-                            : current.ThenBy(t => t.Submitter),
+                            ? orderedQuery.ThenByDescending(t => t.Submitter)
+                            : orderedQuery.ThenBy(t => t.Submitter),
                         "asset" => sortField.SortDesc
-                            ? current.ThenByDescending(t => t.Asset)
-                            : current.ThenBy(t => t.Asset),
+                            ? orderedQuery.ThenByDescending(t => t.Asset)
+                            : orderedQuery.ThenBy(t => t.Asset),
                         "referredto" => sortField.SortDesc
-                            ? current.ThenByDescending(t => t.ReferredTo)
-                            : current.ThenBy(t => t.ReferredTo),
+                            ? orderedQuery.ThenByDescending(t => t.ReferredTo)
+                            : orderedQuery.ThenBy(t => t.ReferredTo),
                         "dept" => sortField.SortDesc
-                            ? current.ThenByDescending(t => t.Dept)
-                            : current.ThenBy(t => t.Dept),
+                            ? orderedQuery.ThenByDescending(t => t.Dept)
+                            : orderedQuery.ThenBy(t => t.Dept),
                         "location" => sortField.SortDesc
-                            ? current.ThenByDescending(t => t.Location)
-                            : current.ThenBy(t => t.Location),
+                            ? orderedQuery.ThenByDescending(t => t.Location)
+                            : orderedQuery.ThenBy(t => t.Location),
                         "created" => sortField.SortDesc
-                            ? current.ThenByDescending(t => t.Created)
-                            : current.ThenBy(t => t.Created),
-                        _ => current
-                    }
-                );
-            
-            if (!sortFields.Contains("owner"))
-            {
-                orderedQuery = orderedQuery.ThenBy(t => t.Owner);
-            }
+                            ? orderedQuery.ThenByDescending(t => t.Created)
+                            : orderedQuery.ThenBy(t => t.Created),
+                        _ => orderedQuery
+                    };
+                }
 
-            if (!sortFields.Contains("priority"))
-            {
-                orderedQuery = orderedQuery.ThenBy(t => t.PriOrd);
-            }
+                if (!sortFields.Contains("owner"))
+                {
+                    orderedQuery = orderedQuery.ThenBy(t => t.Owner);
+                }
 
-            if (!sortFields.Contains("status"))
-            {
-                orderedQuery = orderedQuery.ThenBy(t => t.StatOrd);
+                if (!sortFields.Contains("priority"))
+                {
+                    orderedQuery = orderedQuery.ThenBy(t => t.PriOrd);
+                }
+
+                if (!sortFields.Contains("status"))
+                {
+                    orderedQuery = orderedQuery.ThenBy(t => t.StatOrd);
+                }
             }
+        }
+        else
+        {
+            orderedQuery = query.OrderBy(t => t.Owner)
+                .ThenBy(t => t.PriOrd)
+                .ThenBy(t => t.StatOrd);
         }
         
         var results = new Response
