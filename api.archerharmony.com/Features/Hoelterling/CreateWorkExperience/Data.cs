@@ -37,17 +37,16 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
                 UpdatedBy = createdBy
             }, transaction);
 
-            // Insert German localized data only
+            // Insert German localized data only (company name is not localized as it's a proper noun)
             const string insertDe = """
-                INSERT INTO work_experience_localized (work_experience_id, language_code, title, company, location, updated_by, created_at, updated_at)
-                VALUES (@ExperienceId, 'de', @Title, @Company, @Location, @UpdatedBy, NOW(), NOW())
+                INSERT INTO work_experience_localized (work_experience_id, language_code, title, location, updated_by, created_at, updated_at)
+                VALUES (@ExperienceId, 'de', @Title, @Location, @UpdatedBy, NOW(), NOW())
                 """;
 
             await conn.ExecuteAsync(insertDe, new
             {
                 ExperienceId = experienceId,
                 Title = de.Title,
-                Company = de.Company,
                 Location = de.Location,
                 UpdatedBy = createdBy
             }, transaction);

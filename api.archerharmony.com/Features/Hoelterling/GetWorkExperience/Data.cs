@@ -20,7 +20,7 @@ public class Data(IDatabaseConnectionFactory databaseConnectionFactory) : IData
             SELECT
                 we.id,
                 COALESCE(wel.title, we.title) AS title,
-                COALESCE(wel.company, we.company) AS company,
+                we.company AS company,
                 COALESCE(wel.location, we.location) AS location,
                 we.start_date AS StartDate,
                 we.end_date AS EndDate

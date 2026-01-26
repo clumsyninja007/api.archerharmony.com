@@ -1,3 +1,5 @@
+using api.archerharmony.com.Extensions;
+
 namespace api.archerharmony.com.Features.Hoelterling.UpdateWorkExperience;
 
 public class Endpoint(IData data) : Endpoint<Request>
@@ -11,7 +13,7 @@ public class Endpoint(IData data) : Endpoint<Request>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var username = User.Identity?.Name ?? "unknown";
+        var username = User.GetUsername();
         await data.UpdateWorkExperience(req.ExperienceId, req.En, req.De, username);
         await Send.NoContentAsync(ct);
     }

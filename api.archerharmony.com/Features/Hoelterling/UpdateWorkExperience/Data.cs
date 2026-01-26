@@ -43,13 +43,12 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
                 UpdatedBy = updatedBy
             }, transaction);
 
-            // Upsert German localized data only
+            // Upsert German localized data only (company name is not localized as it's a proper noun)
             const string upsertDe = """
-                INSERT INTO work_experience_localized (work_experience_id, language_code, title, company, location, updated_by)
-                VALUES (@ExperienceId, 'de', @Title, @Company, @Location, @UpdatedBy)
+                INSERT INTO work_experience_localized (work_experience_id, language_code, title, location, updated_by)
+                VALUES (@ExperienceId, 'de', @Title, @Location, @UpdatedBy)
                 ON DUPLICATE KEY UPDATE
                     title = @Title,
-                    company = @Company,
                     location = @Location,
                     updated_by = @UpdatedBy,
                     updated_at = NOW()
@@ -59,7 +58,6 @@ public class Data(IDatabaseConnectionFactory connectionFactory) : IData
             {
                 ExperienceId = experienceId,
                 Title = de.Title,
-                Company = de.Company,
                 Location = de.Location,
                 UpdatedBy = updatedBy
             }, transaction);
