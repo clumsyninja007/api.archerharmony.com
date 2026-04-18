@@ -8,10 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Dapper" Version="2.1.72" />
     <PackageReference Include="dbup-mysql" Version="6.1.0" />
-    <PackageReference Include="FastEndpoints" Version="8.0.1" />
-    <PackageReference Include="FastEndpoints.Generator" Version="8.0.1">
+    <PackageReference Include="FastEndpoints" Version="8.1.0" />
+    <PackageReference Include="FastEndpoints.Generator" Version="8.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -21,7 +21,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Telegram.Bot" Version="22.8.1" />
+    <PackageReference Include="Telegram.Bot" Version="22.9.6.1" />
   </ItemGroup>
 
   <ItemGroup>
