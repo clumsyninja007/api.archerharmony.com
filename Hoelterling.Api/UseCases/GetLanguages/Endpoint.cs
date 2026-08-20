@@ -8,7 +8,7 @@ public class Endpoint(IData data) : Endpoint<Request, IEnumerable<string>>
     public override void Configure()
     {
         Get("person/{personId}/languages");
-        Group<HoelterlingGroup>();
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)

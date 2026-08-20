@@ -1,27 +1,27 @@
 using FastEndpoints;
 using Hoelterling.Api.Extensions;
 
-namespace Hoelterling.Api.UseCases.GetEducation;
+namespace Hoelterling.Api.UseCases.GetWorkExperience;
 
-public class Endpoint(IData data) : Endpoint<Request, IEnumerable<EducationRecord>>
+public class Endpoint(IData data) : Endpoint<Request, IEnumerable<WorkExperience>>
 {
     public override void Configure()
     {
-        Get("person/{personId}/education");
+        Get("person/{personId}/experience");
         AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
         var language = HttpContext.Request.GetLanguage();
-        var education = await data.GetEducation(req.PersonId, language, ct);
+        var experience = await data.GetWorkExperiences(req.PersonId, language, ct);
 
-        if (education.Count == 0)
+        if (experience.Count == 0)
         {
             await Send.NoContentAsync(ct);
             return;
         }
 
-        await Send.OkAsync(education, ct);
+        await Send.OkAsync(experience, ct);
     }
 }
