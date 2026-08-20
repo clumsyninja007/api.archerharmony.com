@@ -4,7 +4,22 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Identity.Web;
 
+const string devCors = "devPolicy";
+const string prodCors = "prodPolicy";
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(devCors, policy =>
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+    options.AddPolicy(prodCors, policy =>
+        policy.WithOrigins("https://archer.hoelterling.me")
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
 
 var databaseId = builder.Environment.IsDevelopment() ? "HoelterlingDb-Test" : "HoelterlingDb";
 builder.Services.AddSingleton(_ =>
@@ -25,12 +40,6 @@ builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
-// ⚠️ Entra puts app roles in the "roles" claim; ASP.NET's default role claim type is different,
-// so RequireRole / FastEndpoints Roles(...) won't see it unless we point it at "roles".
-builder.Services.Configure<JwtBearerOptions>(
-    JwtBearerDefaults.AuthenticationScheme,
-    options => options.TokenValidationParameters.RoleClaimType = "roles");
-
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ContentAdmin", policy => policy.RequireRole("content-admin"));
@@ -40,6 +49,17 @@ builder.Services.AddFastEndpoints();
 builder.Services.RegisterServicesFromHoelterlingApi();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors(devCors);
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseCors(prodCors);
+    app.UseHsts();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
