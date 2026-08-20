@@ -11,6 +11,7 @@
       <PackageReference Include="FastEndpoints" Version="8.2.0" />
       <PackageReference Include="FastEndpoints.Generator" Version="8.2.0" />
       <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.62.1" />
+      <PackageReference Include="Microsoft.Identity.Web" Version="4.14.2" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     </ItemGroup>
 
