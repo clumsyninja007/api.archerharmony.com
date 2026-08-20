@@ -1,6 +1,0 @@
-namespace Hoelterling.Api.UseCases.GetSkills;
-
-public sealed record Request
-{
-    public int PersonId { get; init; }
-}
