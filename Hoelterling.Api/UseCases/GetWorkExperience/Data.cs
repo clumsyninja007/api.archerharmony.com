@@ -1,4 +1,5 @@
 using FastEndpoints;
+using Hoelterling.Api.Extensions;
 using Hoelterling.Api.Helpers;
 using Microsoft.Azure.Cosmos;
 
@@ -30,27 +31,20 @@ public class Data(Container container) : IData
             ORDER BY c.startDate DESC
             """;
 
-        using var iterator = container.GetItemQueryIterator<WorkExperienceDoc>(
+        var docs = await container.QueryAsync<WorkExperienceDoc>(
             new QueryDefinition(query).WithParameter("@personId", personId),
-            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey("workExperience") });
+            new PartitionKey("workExperience"), ct);
 
-        var results = new List<WorkExperience>();
-        while (iterator.HasMoreResults)
-        {
-            foreach (var doc in await iterator.ReadNextAsync(ct))
-            {
-                results.Add(new WorkExperience(
-                    Id: doc.Id,
-                    Title: LocalizationHelper.Localize(doc.Title, doc.Localizations, language, "title"),
-                    Company: doc.Company, // NOT localized (proper noun)
-                    Location: LocalizationHelper.Localize(doc.Location, doc.Localizations, language, "location"),
-                    StartDate: doc.StartDate,
-                    EndDate: doc.EndDate,
-                    Skills: doc.Skills
-                        .OrderBy(s => s.DisplayOrder)
-                        .Select(s => LocalizationHelper.Localize(s.Skill, s.Localizations, language, "skill"))));
-            }
-        }
-        return results;
+        return docs.Select(doc => new WorkExperience(
+            Id: doc.Id,
+            Title: LocalizationHelper.Localize(doc.Title, doc.Localizations, language, "title"),
+            Company: doc.Company, // NOT localized (proper noun)
+            Location: LocalizationHelper.Localize(doc.Location, doc.Localizations, language, "location"),
+            StartDate: doc.StartDate,
+            EndDate: doc.EndDate,
+            Skills: doc.Skills
+                .OrderBy(s => s.DisplayOrder)
+                .Select(s => LocalizationHelper.Localize(s.Skill, s.Localizations, language, "skill")))
+        ).ToList();
     }
 }

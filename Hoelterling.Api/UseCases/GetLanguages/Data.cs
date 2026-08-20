@@ -1,4 +1,5 @@
 using FastEndpoints;
+using Hoelterling.Api.Extensions;
 using Hoelterling.Api.Helpers;
 using Microsoft.Azure.Cosmos;
 
@@ -26,18 +27,14 @@ public class Data(Container container) : IData
             ORDER BY c.displayOrder
             """;
 
-        using var iterator = container.GetItemQueryIterator<LanguageDoc>(
+        var docs = await container.QueryAsync<LanguageDoc>(
             new QueryDefinition(query).WithParameter("@personId", personId),
-            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey("personLanguage") });
-        
-        var results = new List<string>();
-        while (iterator.HasMoreResults)
-        {
-            foreach (var doc in await iterator.ReadNextAsync(ct))
-            {
-                results.Add($"{LocalizationHelper.Localize(doc.Language, doc.Localizations, language, "language")} ({LocalizationHelper.Localize(doc.ProficiencyLevel, doc.Localizations, language,"proficiencyLevel")})");
-            }
-        }
-        return results;
+            new PartitionKey("personLanguage"), ct);
+
+        return docs
+            .Select(doc =>
+                $"{LocalizationHelper.Localize(doc.Language, doc.Localizations, language, "language")} " +
+                $"({LocalizationHelper.Localize(doc.ProficiencyLevel, doc.Localizations, language, "proficiencyLevel")})")
+            .ToList();
     }
 }
