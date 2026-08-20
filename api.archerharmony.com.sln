@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hoelterling.Api", "Hoelterling.Api\Hoelterling.Api.csproj", "{0AABC017-84C8-4B1B-B157-8B10D01FCE26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notkace.Api", "Notkace.Api\Notkace.Api.csproj", "{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,18 @@ Global
 		{0AABC017-84C8-4B1B-B157-8B10D01FCE26}.Release|x64.Build.0 = Release|Any CPU
 		{0AABC017-84C8-4B1B-B157-8B10D01FCE26}.Release|x86.ActiveCfg = Release|Any CPU
 		{0AABC017-84C8-4B1B-B157-8B10D01FCE26}.Release|x86.Build.0 = Release|Any CPU
+		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Debug|x64.Build.0 = Debug|Any CPU
+		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Debug|x86.Build.0 = Debug|Any CPU
+		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Release|x64.ActiveCfg = Release|Any CPU
+		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Release|x64.Build.0 = Release|Any CPU
+		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Release|x86.ActiveCfg = Release|Any CPU
+		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
