@@ -1,4 +1,4 @@
-namespace Hoelterling.Api.UseCases.GetSkills;
+namespace Hoelterling.Api.UseCases.GetEducation;
 
 public sealed record Request
 {

@@ -1,5 +1,5 @@
-namespace Hoelterling.Api.Models;
+namespace Hoelterling.Api.UseCases.GetSkills;
 
-public record SkillDoc(
+public sealed record SkillDoc(
     string Label,
     Dictionary<string, Dictionary<string, string?>>? Localizations);
