@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using TelegramBot.Configuration;
 using TelegramBot.Data;
@@ -24,7 +25,7 @@ var connectionString = config.GetConnectionString("TelegramBot")
     ?? throw new InvalidOperationException("ConnectionStrings:TelegramBot is required");
 
 builder.Services.AddDbContext<TelegramBotContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure()));
 
 builder.Services.Configure<BotConfiguration>(config.GetSection("BotConfiguration"));
 
@@ -37,12 +38,22 @@ builder.Services.AddScoped<ITelegramUpdateHandler, TelegramUpdateHandler>();
 
 var app = builder.Build();
 
-// Apply pending EF migrations once per host cold start (idempotent), so a fresh/updated
-// TelegramBot database is schema-ready without a manual `dotnet ef database update`.
+// Apply pending EF migrations once per host cold start (idempotent). Guarded so an
+// unreachable database (paused, firewall, transient) logs and continues rather than crashing
+// the whole host — data-backed functions will error until the database is reachable, but the
+// host stays up and the next cold start retries.
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<TelegramBotContext>();
-    db.Database.Migrate();
+    var services = scope.ServiceProvider;
+    try
+    {
+        services.GetRequiredService<TelegramBotContext>().Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        services.GetRequiredService<ILogger<Program>>()
+            .LogError(ex, "Startup database migration failed; host will continue.");
+    }
 }
 
 app.Run();

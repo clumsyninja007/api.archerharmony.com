@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramBot.Configuration;
 using TelegramBot.Services;
@@ -34,7 +35,9 @@ public class UpdateFunction(
         Update? update;
         try
         {
-            update = JsonSerializer.Deserialize<Update>(body);
+            // Telegram.Bot v22 serializes/deserializes with its own options (snake_case +
+            // source-gen context); default System.Text.Json leaves fields like Entities empty.
+            update = JsonSerializer.Deserialize<Update>(body, JsonBotAPI.Options);
         }
         catch (JsonException ex)
         {

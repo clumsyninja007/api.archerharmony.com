@@ -28,8 +28,10 @@ public class TelegramUpdateHandler(
         var message = update.Message;
         long chatId = message.Chat.Id;
 
-        // Only react to messages that carry a bot-command entity.
-        var command = message.EntityValues?.FirstOrDefault();
+        // Only react to messages that carry a bot-command entity. Strip any "@botname" suffix
+        // Telegram appends (always in groups, sometimes in 1:1) so "/joke" and "/joke@ArchBot"
+        // both match.
+        var command = message.EntityValues?.FirstOrDefault()?.Split('@')[0];
         var commandProps = message.Entities?.FirstOrDefault();
         if (command is null || commandProps is null)
         {
