@@ -34,6 +34,15 @@ builder.Services.RegisterServicesFromNotkaceApi();
 
 var app = builder.Build();
 
+// Apply any pending EF migrations on startup (idempotent — checks __EFMigrationsHistory and
+// runs only what's outstanding), so a fresh/updated database is schema-ready without a manual
+// `dotnet ef database update`.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<NotkaceContext>();
+    db.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseCors(devCors);
