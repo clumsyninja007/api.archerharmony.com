@@ -1,6 +1,7 @@
 using Azure.Identity;
 using FastEndpoints;
 using Hoelterling.Api;
+using Hoelterling.Api.HealthChecks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Identity.Web;
@@ -61,6 +62,9 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddFastEndpoints();
 builder.Services.RegisterServicesFromHoelterlingApi();
 
+builder.Services.AddHealthChecks()
+    .AddCheck<CosmosHealthCheck>("cosmos");
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -78,5 +82,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseFastEndpoints();
+
+app.MapHealthChecks("/healthz");
 
 app.Run();
