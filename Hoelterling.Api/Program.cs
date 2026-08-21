@@ -1,3 +1,4 @@
+using Azure.Identity;
 using FastEndpoints;
 using Hoelterling.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,15 +25,27 @@ builder.Services.AddCors(options =>
 var databaseId = builder.Environment.IsDevelopment() ? "HoelterlingDb-Test" : "HoelterlingDb";
 builder.Services.AddSingleton(_ =>
   {
-      var client = new CosmosClient(
-          builder.Configuration.GetConnectionString("Cosmos"),
-          new CosmosClientOptions
+      var options = new CosmosClientOptions
+      {
+          SerializerOptions = new CosmosSerializationOptions
           {
-              SerializerOptions = new CosmosSerializationOptions
-              {
-                  PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
-              }
-          });
+              PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
+          }
+      };
+
+      // Local dev uses the account key from user-secrets (ConnectionStrings:Cosmos). In Azure
+      // no key is configured, so authenticate with the Container App's managed identity via
+      // Cosmos:Endpoint (the account URI) + DefaultAzureCredential — no secret anywhere.
+      var connectionString = builder.Configuration.GetConnectionString("Cosmos");
+      var client = string.IsNullOrEmpty(connectionString)
+          ? new CosmosClient(
+              builder.Configuration["Cosmos:Endpoint"]
+                  ?? throw new InvalidOperationException(
+                      "Set ConnectionStrings:Cosmos (local) or Cosmos:Endpoint (managed identity)."),
+              new DefaultAzureCredential(),
+              options)
+          : new CosmosClient(connectionString, options);
+
       return client.GetContainer(databaseId, "portfolio");
   });
 
