@@ -5,6 +5,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <UserSecretsId>edf8188b-ea0d-4c3c-b9a1-fd95d0ce58f8</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,6 +13,7 @@
       <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.11" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.11" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.11" />
       <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.11" />
     </ItemGroup>
 

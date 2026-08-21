@@ -342,3 +342,6 @@ healthchecksdb
 
 # Notkace data migrator: real connection strings (use appsettings.example.json as template)
 tools/NotkaceDataMigrator/appsettings.json
+
+# Azure Functions local settings (secrets) — use local.settings.example.json as template
+TelegramBot/local.settings.json

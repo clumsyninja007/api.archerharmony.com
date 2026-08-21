@@ -1,0 +1,10 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "WEBSITE_TIME_ZONE": "America/Los_Angeles",
+    "ConnectionStrings__TelegramBot": "Server=tcp:<server>.database.windows.net,1433;Database=TelegramBot;User ID=<admin>;Password=<password>;Encrypt=True;",
+    "BotConfiguration__BotToken": "<telegram-bot-token>"
+  }
+}

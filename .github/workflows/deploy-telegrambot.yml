@@ -1,0 +1,37 @@
+name: Deploy TelegramBot Function
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'TelegramBot/**'
+      - '.github/workflows/deploy-telegrambot.yml'
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  PROJECT_PATH: 'TelegramBot/TelegramBot.csproj'
+  PUBLISH_DIR: 'output'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Publish
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_DIR }}
+
+      - name: Deploy to Azure Functions
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ vars.TELEGRAM_FUNCTIONAPP_NAME }}
+          package: ${{ env.PUBLISH_DIR }}
+          publish-profile: ${{ secrets.TELEGRAM_FUNCTIONAPP_PUBLISH_PROFILE }}

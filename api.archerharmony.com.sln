@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{07C2787E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotkaceDataMigrator", "tools\NotkaceDataMigrator\NotkaceDataMigrator.csproj", "{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBot", "TelegramBot\TelegramBot.csproj", "{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -106,6 +108,18 @@ Global
 		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Release|x64.Build.0 = Release|Any CPU
 		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Release|x86.ActiveCfg = Release|Any CPU
 		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Release|x86.Build.0 = Release|Any CPU
+		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Debug|x64.Build.0 = Debug|Any CPU
+		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Debug|x86.Build.0 = Debug|Any CPU
+		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Release|x64.ActiveCfg = Release|Any CPU
+		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Release|x64.Build.0 = Release|Any CPU
+		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Release|x86.ActiveCfg = Release|Any CPU
+		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
