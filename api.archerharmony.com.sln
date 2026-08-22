@@ -3,16 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29318.209
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "api.archerharmony.com", "api.archerharmony.com\api.archerharmony.com.csproj", "{19D736D2-F7EB-4171-976A-AE7D1C66F702}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionFolder", "{6A5CA3A9-F3D0-4081-AADE-0F4F9033E527}"
 	ProjectSection(SolutionItems) = preProject
 		Dockerfile = Dockerfile
 		.dockerignore = .dockerignore
 		.gitignore = .gitignore
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "api.archerharmony.com.Data", "api.archerharmony.com.Data\api.archerharmony.com.Data.csproj", "{9B250A4D-8681-4A12-893C-5EB109957469}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hoelterling.Api", "Hoelterling.Api\Hoelterling.Api.csproj", "{0AABC017-84C8-4B1B-B157-8B10D01FCE26}"
 EndProject
@@ -30,30 +26,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{19D736D2-F7EB-4171-976A-AE7D1C66F702}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{19D736D2-F7EB-4171-976A-AE7D1C66F702}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{19D736D2-F7EB-4171-976A-AE7D1C66F702}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{19D736D2-F7EB-4171-976A-AE7D1C66F702}.Debug|x64.Build.0 = Debug|Any CPU
-		{19D736D2-F7EB-4171-976A-AE7D1C66F702}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{19D736D2-F7EB-4171-976A-AE7D1C66F702}.Debug|x86.Build.0 = Debug|Any CPU
-		{19D736D2-F7EB-4171-976A-AE7D1C66F702}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{19D736D2-F7EB-4171-976A-AE7D1C66F702}.Release|Any CPU.Build.0 = Release|Any CPU
-		{19D736D2-F7EB-4171-976A-AE7D1C66F702}.Release|x64.ActiveCfg = Release|Any CPU
-		{19D736D2-F7EB-4171-976A-AE7D1C66F702}.Release|x64.Build.0 = Release|Any CPU
-		{19D736D2-F7EB-4171-976A-AE7D1C66F702}.Release|x86.ActiveCfg = Release|Any CPU
-		{19D736D2-F7EB-4171-976A-AE7D1C66F702}.Release|x86.Build.0 = Release|Any CPU
-		{9B250A4D-8681-4A12-893C-5EB109957469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B250A4D-8681-4A12-893C-5EB109957469}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B250A4D-8681-4A12-893C-5EB109957469}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{9B250A4D-8681-4A12-893C-5EB109957469}.Debug|x64.Build.0 = Debug|Any CPU
-		{9B250A4D-8681-4A12-893C-5EB109957469}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{9B250A4D-8681-4A12-893C-5EB109957469}.Debug|x86.Build.0 = Debug|Any CPU
-		{9B250A4D-8681-4A12-893C-5EB109957469}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B250A4D-8681-4A12-893C-5EB109957469}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B250A4D-8681-4A12-893C-5EB109957469}.Release|x64.ActiveCfg = Release|Any CPU
-		{9B250A4D-8681-4A12-893C-5EB109957469}.Release|x64.Build.0 = Release|Any CPU
-		{9B250A4D-8681-4A12-893C-5EB109957469}.Release|x86.ActiveCfg = Release|Any CPU
-		{9B250A4D-8681-4A12-893C-5EB109957469}.Release|x86.Build.0 = Release|Any CPU
 		{0AABC017-84C8-4B1B-B157-8B10D01FCE26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0AABC017-84C8-4B1B-B157-8B10D01FCE26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AABC017-84C8-4B1B-B157-8B10D01FCE26}.Debug|x64.ActiveCfg = Debug|Any CPU
