@@ -24,7 +24,7 @@ var connectionString = builder.Configuration.GetConnectionString("Notkace")
     ?? throw new InvalidOperationException("ConnectionStrings:Notkace is required");
 
 builder.Services.AddDbContext<NotkaceContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure()));
 
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<NotkaceContext>("notkace_db");
@@ -34,11 +34,14 @@ builder.Services.RegisterServicesFromNotkaceApi();
 
 var app = builder.Build();
 
-// Apply any pending EF migrations on startup (idempotent — checks __EFMigrationsHistory and
-// runs only what's outstanding), so a fresh/updated database is schema-ready without a manual
-// `dotnet ef database update`.
-using (var scope = app.Services.CreateScope())
+// Dev only: apply pending EF migrations on startup so a fresh local database is schema-ready
+// without a manual `dotnet ef database update`. In Azure the schema is a one-time static
+// snapshot managed out-of-band, and the app's managed identity holds only db_datareader — so we
+// skip Migrate() (it needs DDL rights) and keep least privilege. Schema changes there are applied
+// manually with an admin login.
+if (app.Environment.IsDevelopment())
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<NotkaceContext>();
     db.Database.Migrate();
 }

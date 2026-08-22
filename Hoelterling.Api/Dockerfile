@@ -9,7 +9,6 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 COPY ["Hoelterling.Api/Hoelterling.Api.csproj", "Hoelterling.Api/"]
-COPY ["Shared/Shared.csproj", "Shared/"]
 RUN dotnet restore "Hoelterling.Api/Hoelterling.Api.csproj"
 
 COPY . .

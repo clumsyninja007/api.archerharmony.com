@@ -3,8 +3,6 @@ using Hoelterling.Api.Extensions;
 
 namespace Hoelterling.Api.UseCases.Auth.GetAuthStatus;
 
-// No AllowAnonymous and no Roles() => any *authenticated* caller (401 without a token).
-// The server is the authority on the role; the client just reads the result.
 public class Endpoint : EndpointWithoutRequest<Response>
 {
     public override void Configure()

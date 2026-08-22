@@ -1,12 +1,12 @@
-name: Deploy Hoelterling API
+name: Deploy Notkace API
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'Hoelterling.Api/**'
-      - '.github/workflows/deploy-hoelterling-api.yml'
+      - 'Notkace.Api/**'
+      - '.github/workflows/deploy-notkace-api.yml'
   workflow_dispatch:
 
 permissions:
@@ -15,8 +15,8 @@ permissions:
   id-token: write      # OIDC login to Azure
 
 env:
-  IMAGE: ghcr.io/${{ github.repository_owner }}/hoelterling-api
-  CONTAINERAPP_NAME: ca-hoelterling-api
+  IMAGE: ghcr.io/${{ github.repository_owner }}/notkace-api
+  CONTAINERAPP_NAME: ca-notkace-api
   RESOURCE_GROUP: rg-hoelterling
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Hoelterling.Api/Dockerfile
+          file: Notkace.Api/Dockerfile
           push: true
           tags: |
             ${{ env.IMAGE }}:${{ github.sha }}

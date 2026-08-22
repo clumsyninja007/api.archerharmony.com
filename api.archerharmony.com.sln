@@ -14,15 +14,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "api.archerharmony.com.Data", "api.archerharmony.com.Data\api.archerharmony.com.Data.csproj", "{9B250A4D-8681-4A12-893C-5EB109957469}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{F34F3970-EDAA-4DA4-A149-57966BC46F4A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hoelterling.Api", "Hoelterling.Api\Hoelterling.Api.csproj", "{0AABC017-84C8-4B1B-B157-8B10D01FCE26}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notkace.Api", "Notkace.Api\Notkace.Api.csproj", "{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{07C2787E-EAC7-C090-1BA3-A61EC2A24D84}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotkaceDataMigrator", "tools\NotkaceDataMigrator\NotkaceDataMigrator.csproj", "{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBot", "TelegramBot\TelegramBot.csproj", "{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}"
 EndProject
@@ -60,18 +54,6 @@ Global
 		{9B250A4D-8681-4A12-893C-5EB109957469}.Release|x64.Build.0 = Release|Any CPU
 		{9B250A4D-8681-4A12-893C-5EB109957469}.Release|x86.ActiveCfg = Release|Any CPU
 		{9B250A4D-8681-4A12-893C-5EB109957469}.Release|x86.Build.0 = Release|Any CPU
-		{F34F3970-EDAA-4DA4-A149-57966BC46F4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F34F3970-EDAA-4DA4-A149-57966BC46F4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F34F3970-EDAA-4DA4-A149-57966BC46F4A}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F34F3970-EDAA-4DA4-A149-57966BC46F4A}.Debug|x64.Build.0 = Debug|Any CPU
-		{F34F3970-EDAA-4DA4-A149-57966BC46F4A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F34F3970-EDAA-4DA4-A149-57966BC46F4A}.Debug|x86.Build.0 = Debug|Any CPU
-		{F34F3970-EDAA-4DA4-A149-57966BC46F4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F34F3970-EDAA-4DA4-A149-57966BC46F4A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F34F3970-EDAA-4DA4-A149-57966BC46F4A}.Release|x64.ActiveCfg = Release|Any CPU
-		{F34F3970-EDAA-4DA4-A149-57966BC46F4A}.Release|x64.Build.0 = Release|Any CPU
-		{F34F3970-EDAA-4DA4-A149-57966BC46F4A}.Release|x86.ActiveCfg = Release|Any CPU
-		{F34F3970-EDAA-4DA4-A149-57966BC46F4A}.Release|x86.Build.0 = Release|Any CPU
 		{0AABC017-84C8-4B1B-B157-8B10D01FCE26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0AABC017-84C8-4B1B-B157-8B10D01FCE26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AABC017-84C8-4B1B-B157-8B10D01FCE26}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -96,18 +78,6 @@ Global
 		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Release|x64.Build.0 = Release|Any CPU
 		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Release|x86.ActiveCfg = Release|Any CPU
 		{06080226-6AE0-4C0E-BAF7-156D33C8BDAB}.Release|x86.Build.0 = Release|Any CPU
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Debug|x64.Build.0 = Debug|Any CPU
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Debug|x86.Build.0 = Debug|Any CPU
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Release|x64.ActiveCfg = Release|Any CPU
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Release|x64.Build.0 = Release|Any CPU
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Release|x86.ActiveCfg = Release|Any CPU
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4}.Release|x86.Build.0 = Release|Any CPU
 		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9361B8B-DECB-405D-BEB8-78EE61A7E43B}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -123,9 +93,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{09C2DD82-E85F-4EDA-A288-A83FEC8711C4} = {07C2787E-EAC7-C090-1BA3-A61EC2A24D84}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9EB34B35-11D2-405A-85CD-50BEAC96B3B2}
