@@ -1,237 +1,190 @@
 # Archer Harmony API
 
-A multi-tenant .NET 10 ASP.NET Core Web API serving multiple domains and products using FastEndpoints and a feature-based architecture.
+A .NET 10 solution of three independently deployed backends, each serving one product and owning its own datastore and hosting model.
 
 ## Overview
 
-This API serves as the backend for multiple applications:
-- **Hoelterling**: Personal portfolio/resume API
-- **Notkace**: Ticketing system API
-- **TelegramBot**: Telegram bot integration endpoints
+| Project | Product | Host | Datastore | Auth |
+|---|---|---|---|---|
+| **Hoelterling.Api** | Personal portfolio / resume API | Azure Container Apps | Azure Cosmos DB (NoSQL) | Entra ID (JWT) |
+| **Notkace.Api** | Ticketing system API | Azure Container Apps | Azure SQL (EF Core) | Anonymous (per-endpoint) |
+| **TelegramBot** | Telegram bot (webhook + scheduler) | Azure Functions | Azure SQL (EF Core) | Shared-secret path token |
+
+The projects share no code and no database. Each has its own `Dockerfile`/host, `UserSecretsId`, and GitHub Actions workflow, and each deploys on its own when its folder changes. The Vue SPAs that consume these APIs (`archer.hoelterling.me`, `notkace.hoelterling.me`) live in separate frontend repos and are hosted on Azure Static Web Apps.
 
 ## Technology Stack
 
-- **.NET 10** - ASP.NET Core Web API
-- **FastEndpoints** - Minimal API routing framework
-- **Entity Framework Core** - ORM for TelegramBot and Notkace databases
-- **Dapper** - Micro-ORM for complex queries (Hoelterling)
-- **DbUp** - Database migration tool for Hoelterling database
-- **MySQL/MariaDB** - Three separate databases for each domain
-- **Docker** - Containerized deployment
-- **GitHub Actions** - CI/CD pipeline
+- **.NET 10** — ASP.NET Core (the two APIs) and the Azure Functions isolated worker (TelegramBot)
+- **FastEndpoints 8.3** — endpoint routing for both APIs
+- **Azure Cosmos DB** (`Microsoft.Azure.Cosmos`) — Hoelterling data
+- **Entity Framework Core 10 (SQL Server)** — Notkace and TelegramBot data on Azure SQL
+- **Microsoft.Identity.Web** — Entra ID JWT validation (Hoelterling)
+- **Azure.Identity** — `DefaultAzureCredential` / managed identity for keyless data access in Azure
+- **Telegram.Bot** — Telegram client (TelegramBot)
+- **Docker + GHCR** — container images for the two APIs
+- **GitHub Actions** — per-project CI/CD to Azure (OIDC login, no stored Azure credentials)
 
-## Project Structure
+## Solution Layout
 
 ```
 api.archerharmony.com/
-├── api.archerharmony.com/          # Main Web API project
-│   ├── Features/                   # Feature-based endpoint organization
-│   │   ├── Hoelterling/           # Portfolio API endpoints
-│   │   ├── Notkace/               # Ticketing system endpoints
-│   │   └── TelegramBot/           # Telegram bot endpoints
-│   ├── Extensions/                # Extension methods and utilities
-│   └── Program.cs                 # Application entry point
-└── api.archerharmony.com.Data/    # Data access layer
-    ├── Entities/                  # EF Core entities and contexts
-    └── Migrations/                # Database migration scripts
+├── Hoelterling.Api/      # Portfolio API  → Azure Container Apps (ca-hoelterling-api)
+│   ├── UseCases/         #   one folder per operation (Endpoint / Data / Request / Response, + Dtos)
+│   ├── Extensions/       #   Cosmos query helper, claims + request helpers
+│   ├── HealthChecks/     #   CosmosHealthCheck
+│   ├── Dockerfile
+│   └── Program.cs
+├── Notkace.Api/          # Ticketing API  → Azure Container Apps (ca-notkace-api)
+│   ├── UseCases/         #   endpoints grouped by resource (Tickets / Assets / Users)
+│   ├── Data/             #   NotkaceContext, entities, EF Core migrations
+│   ├── Dockerfile
+│   └── Program.cs
+├── TelegramBot/          # Telegram bot  → Azure Functions
+│   ├── Functions/        #   UpdateFunction (HTTP webhook), WaterReminderFunction (timer)
+│   ├── Services/         #   TelegramUpdateHandler — command logic (host-agnostic)
+│   ├── Data/             #   TelegramBotContext, entities, EF Core migrations
+│   ├── host.json
+│   └── Program.cs
+└── .github/workflows/    # deploy-hoelterling-api.yml, deploy-notkace-api.yml, deploy-telegrambot.yml
 ```
+
+## Architecture
+
+### FastEndpoints (Hoelterling.Api, Notkace.Api)
+
+Each operation lives in its own `UseCases/<Area>/<Operation>/` folder with an `Endpoint`, a `Data` class, and request/response DTOs. `Data` classes are auto-registered by the FastEndpoints source generator via `[RegisterService<IData>(LifeTime.Scoped)]` and picked up by `RegisterServicesFrom<Project>()` in `Program.cs`.
+
+```csharp
+public class Endpoint(IData data) : Endpoint<Request, IEnumerable<WorkExperience>>
+{
+    public override void Configure()
+    {
+        Get("person/{personId}/experience");
+        AllowAnonymous();               // or Roles("content-admin") / Group<TicketsGroup>()
+    }
+
+    public override async Task HandleAsync(Request req, CancellationToken ct) { ... }
+}
+```
+
+- **Hoelterling.Api** sets access per endpoint: public reads use `AllowAnonymous()`; admin writes use `Roles("content-admin")`.
+- **Notkace.Api** uses route groups (`TicketsGroup` → `hdTickets`, plus `AssetsGroup`, `UsersGroup`), each currently `AllowAnonymous()`.
+
+### Data access
+
+- **Hoelterling.Api** injects a Cosmos `Container` (registered as a singleton in `Program.cs`) and runs SQL-style queries through the `QueryAsync` extension in `Extensions/CosmosContainerExtensions.cs`. Documents are typed (`*Document` DTOs) and localized via `LocalizationHelper`.
+- **Notkace.Api** uses `NotkaceContext` (EF Core) with `EnableRetryOnFailure()`. In Azure the app's managed identity holds only `db_datareader`; schema is managed out-of-band, so `Database.Migrate()` runs **only in Development**.
+- **TelegramBot** uses `TelegramBotContext` (EF Core) and migrates on cold start (guarded — a failure logs and lets the host keep running).
+
+### Authentication
+
+- **Hoelterling.Api** validates Entra ID JWTs via `AddMicrosoftIdentityWebApi(AzureAd)`. Admin endpoints require the `content-admin` role (`ContentAdmin` policy / `Roles("content-admin")`).
+- **Notkace.Api** endpoints are anonymous.
+- **TelegramBot** webhook authenticates by requiring the `{token}` path segment to equal the bot token (the webhook URL is the shared secret).
+
+### Keyless access in Azure
+
+No connection secrets are stored in Azure. Each service authenticates to its datastore with its **system-assigned managed identity** via `DefaultAzureCredential`:
+
+- Hoelterling → Cosmos: local dev uses `ConnectionStrings:Cosmos` (account key from user-secrets, database `HoelterlingDb-Test`); Azure uses `Cosmos:Endpoint` (account URI) + managed identity (database `HoelterlingDb`, container `portfolio`).
+- Notkace / TelegramBot → Azure SQL: connection string uses `Authentication=Active Directory Managed Identity`; the identity is a contained DB user with least-privilege rights.
 
 ## Getting Started
 
 ### Prerequisites
 
 - .NET 10 SDK
-- MySQL/MariaDB server (or Docker for databases)
-- Docker (optional, for containerized deployment)
+- Azure Functions Core Tools v4 (to run TelegramBot locally)
+- Access to a Cosmos DB account and a SQL Server / Azure SQL database (or local equivalents)
 
-### Configuration
+### Configuration (local)
 
-The application requires three connection strings configured via environment variables or user secrets:
+Each project reads secrets from .NET user secrets (its own `UserSecretsId`).
 
+**Hoelterling.Api**
 ```bash
-ConnectionStrings__Hoelterling="Server=localhost;Database=hoelterling;User=root;Password=xxx"
-ConnectionStrings__TelegramBot="Server=localhost;Database=telegrambot;User=root;Password=xxx"
-ConnectionStrings__Notkace="Server=localhost;Database=notkace;User=root;Password=xxx"
+dotnet user-secrets set "ConnectionStrings:Cosmos" "<cosmos-account-connection-string>" \
+  --project Hoelterling.Api
+# AzureAd section (TenantId, ClientId, etc.) also via user-secrets or appsettings.Development.json
 ```
 
-**Development**: Use .NET user secrets
+**Notkace.Api**
 ```bash
-dotnet user-secrets set "ConnectionStrings__Hoelterling" "your-connection-string"
-dotnet user-secrets set "ConnectionStrings__TelegramBot" "your-connection-string"
-dotnet user-secrets set "ConnectionStrings__Notkace" "your-connection-string"
+dotnet user-secrets set "ConnectionStrings:Notkace" "<sql-connection-string>" \
+  --project Notkace.Api
 ```
 
-**Production**: Use environment variables or Docker secrets (file paths)
+**TelegramBot** (`local.settings.json` or user-secrets; see `local.settings.example.json`)
+```bash
+dotnet user-secrets set "ConnectionStrings:TelegramBot" "<sql-connection-string>" --project TelegramBot
+dotnet user-secrets set "BotConfiguration:BotToken"     "<telegram-bot-token>"    --project TelegramBot
+```
+
+In Azure these are supplied as Container App / Function App application settings, and datastore access uses managed identity (see above).
 
 ### Build and Run
 
 ```bash
-# Build the solution
+# Build everything
 dotnet build
 
-# Run the API locally
-dotnet run --project api.archerharmony.com/api.archerharmony.com.csproj
+# Run an API locally
+dotnet run --project Hoelterling.Api
+dotnet run --project Notkace.Api
 
-# Publish for production
-dotnet publish -c Release -o out
+# Run the Functions app locally (requires Core Tools)
+cd TelegramBot && func start
 ```
 
-The API will be available at `http://localhost:5000` (or configured port).
+### Docker (the two APIs)
 
-### Docker
+Images build from the repo root so the build context includes the project:
 
 ```bash
-# Build Docker image
-docker build -t api.archerharmony.com:latest .
-
-# Run with Docker Compose
-docker compose up -d api
+docker build -f Hoelterling.Api/Dockerfile -t hoelterling-api .
+docker build -f Notkace.Api/Dockerfile     -t notkace-api .
 ```
 
-## Architecture
+## Health Checks
 
-### Feature-Based Organization
+Both APIs expose `GET /healthz`:
+- **Hoelterling.Api** — `CosmosHealthCheck` reads the container to verify connectivity.
+- **Notkace.Api** — `AddDbContextCheck<NotkaceContext>` verifies the database is reachable.
 
-Endpoints are organized by domain and feature, promoting maintainability and discoverability:
-
-```
-Features/
-├── Hoelterling/
-│   ├── HoelterlingGroup.cs         # Route group (/hoelterling)
-│   ├── GetWorkExperience/
-│   │   ├── Endpoint.cs             # HTTP endpoint handler
-│   │   ├── Data.cs                 # Data access logic
-│   │   ├── Request.cs              # Request DTO
-│   │   └── WorkExperience.cs       # Response DTO
-│   └── GetSkills/
-│       └── ...
-```
-
-### FastEndpoints Pattern
-
-Each feature follows a consistent structure:
-
-**Endpoint.cs** - HTTP handling
-```csharp
-public class Endpoint(IData data) : Endpoint<Request, Response>
-{
-    public override void Configure()
-    {
-        Get("work-experience/{id}");
-        Group<HoelterlingGroup>();
-    }
-
-    public override async Task HandleAsync(Request req, CancellationToken ct)
-    {
-        var result = await data.GetWorkExperience(req.Id);
-        await SendOkAsync(result, ct);
-    }
-}
-```
-
-**Data.cs** - Data access
-```csharp
-[RegisterService<IData>(LifeTime.Scoped)]
-public class Data(IDatabaseConnectionFactory factory) : IData
-{
-    public async Task<WorkExperience> GetWorkExperience(int id)
-    {
-        // Dapper or EF Core data access
-    }
-}
-```
-
-Services are automatically registered using FastEndpoints source generators via the `[RegisterService]` attribute.
-
-### Data Access Strategy
-
-- **DbUp**: SQL migration scripts for Hoelterling database (run at startup)
-- **Dapper**: Complex queries with multiple result sets
-- **EF Core**: TelegramBot and Notkace databases (code-first migrations)
-- **Database Connection Factory**: Typed access to multiple databases
-
-## Database Migrations
-
-### Hoelterling (DbUp)
-
-Create SQL migration scripts:
-
-1. Add `.sql` file to `api.archerharmony.com.Data/Migrations/Hoelterling/`
-2. Name with sequential numbering: `Script####_Description.sql`
-3. Migrations run automatically on application startup
-
-### TelegramBot / Notkace (EF Core)
+## Database Migrations (EF Core)
 
 ```bash
-# Add migration for TelegramBot context
-dotnet ef migrations add MigrationName --context TelegramBotContext --project api.archerharmony.com.Data
+# Notkace
+dotnet ef migrations add <Name> --project Notkace.Api --context NotkaceContext
 
-# Add migration for Notkace context
-dotnet ef migrations add MigrationName --context NotkaceContext --project api.archerharmony.com.Data
-
-# Apply migrations (or let application startup handle it)
-dotnet ef database update --context TelegramBotContext
+# TelegramBot
+dotnet ef migrations add <Name> --project TelegramBot --context TelegramBotContext
 ```
 
-## API Endpoints
+Notkace applies migrations automatically **only in Development** (least-privilege identity in Azure); apply schema changes there with an admin login. TelegramBot applies pending migrations on host cold start. Cosmos (Hoelterling) is schema-less and needs no migrations.
 
-### Health Check
-- `GET /healthz` - Health check with database connectivity verification
+## CORS
 
-### Hoelterling (Portfolio)
-- Base path: `/hoelterling`
-- Anonymous access enabled
-
-### Notkace (Ticketing)
-- Base path: `/notkace`
-- (Authentication/authorization as configured per endpoint)
-
-### TelegramBot
-- Base path: `/telegram`
-- (Authentication/authorization as configured per endpoint)
-
-## CORS Configuration
-
-**Development**: Allows localhost origins (ports 8080, 5173)
-- `http://localhost:8080`
-- `http://localhost:5173`
-- `http://127.0.0.1:8080`
-
-**Production**: Allows specific domains
-- `https://notkace.archerharmony.com`
-- `https://archer.hoelterling.me`
+| API | Development | Production |
+|---|---|---|
+| Hoelterling.Api | `http://localhost:5173` | `https://archer.hoelterling.me` |
+| Notkace.Api | `http://localhost:5173`, `http://localhost:8080` | `https://notkace.hoelterling.me` |
 
 ## Deployment
 
-Automatic deployment via GitHub Actions on push to `main` branch:
+Deployment is per-project via GitHub Actions on push to `main`, path-filtered so only the changed project deploys. All Azure logins use OIDC (federated credentials) — no Azure secrets stored in GitHub.
 
-1. Builds Docker image
-2. Deploys to DigitalOcean droplet via SSH
-3. Runs with Docker Compose
+- **`deploy-hoelterling-api.yml`** / **`deploy-notkace-api.yml`** — build a Docker image, push to GHCR (`ghcr.io/<owner>/{hoelterling,notkace}-api`), then roll the Container App with `az containerapp update`.
+- **`deploy-telegrambot.yml`** — `dotnet publish` and deploy to the Azure Function App via `Azure/functions-action` (publish-profile auth).
 
-See `.github/workflows/deploy.yml` for details.
+### Required GitHub configuration
 
-## Development Guidelines
+- Secrets: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` (OIDC), `TELEGRAM_FUNCTIONAPP_PUBLISH_PROFILE`
+- Variables: `TELEGRAM_FUNCTIONAPP_NAME`
+- `GITHUB_TOKEN` (built-in) pushes images to GHCR.
 
-### Adding a New Endpoint
+## Adding an Endpoint (APIs)
 
-1. Create feature folder under appropriate domain in `Features/[Domain]/[FeatureName]/`
-2. Add `Endpoint.cs`, `Data.cs`, `Request.cs`, and response DTOs
-3. Implement `IData` interface with `[RegisterService]` attribute
-4. Associate endpoint with route group using `Group<DomainGroup>()`
-5. Services are automatically registered by FastEndpoints
-
-### Secrets Management
-
-Use `GetSecretOrEnvVar(builder, "Key")` for sensitive configuration:
-- Supports double-underscore notation: `ConnectionStrings__Hoelterling`
-- Reads file content if value is a file path (for Docker secrets)
-- Falls back to standard configuration with colon notation
-
-## License
-
-(Add your license information here)
-
-## Contact
-
-(Add your contact information here)
+1. Create `UseCases/<Area>/<Operation>/` with `Endpoint.cs`, `Data.cs` (+ `Request`/`Response`, and `Dtos` as needed).
+2. Implement the `IData` interface and annotate the class with `[RegisterService<IData>(LifeTime.Scoped)]`.
+3. In `Configure()`, set the route and access (`AllowAnonymous()`, `Roles(...)`, or `Group<...>()`).
