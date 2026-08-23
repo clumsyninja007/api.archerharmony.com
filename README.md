@@ -1,4 +1,4 @@
-# Archer Harmony API
+# Archer Hoelterling API
 
 A .NET 10 solution of three independently deployed backends, each serving one product and owning its own datastore and hosting model.
 
